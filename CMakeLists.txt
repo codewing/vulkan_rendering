@@ -7,7 +7,7 @@ set(SOURCE_FILES main.cpp Window.cpp Window.h Renderer.cpp Renderer.h BUILD_OPTI
 add_executable(vulkan_voxel ${SOURCE_FILES})
 
 #variables for libs
-set(GLFW_DIR libs/glfw-3.2.1)
+set(GLFW_DIR libs/glfw)
 
 
 add_subdirectory(${GLFW_DIR})
