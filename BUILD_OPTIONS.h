@@ -1,0 +1,10 @@
+//
+// Created by codewing on 20/10/2017.
+//
+
+#ifndef VULKAN_VOXEL_BUILD_OPTIONS_H
+#define VULKAN_VOXEL_BUILD_OPTIONS_H
+
+#define BUILD_ENABLE_VULKAN_DEBUG 1
+
+#endif //VULKAN_VOXEL_BUILD_OPTIONS_H
