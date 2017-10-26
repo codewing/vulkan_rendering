@@ -1,13 +1,11 @@
 #include <iostream>
-#include <stdexcept>
-#include <functional>
 #include <memory>
 #include "Renderer.h"
 
 int main() {
 
     try {
-        std::shared_ptr<Renderer> renderer(new Renderer(800, 600));
+        std::shared_ptr<Renderer> renderer = std::make_shared<Renderer>(800, 600);
         while(renderer->Run()){
 
         }

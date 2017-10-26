@@ -17,7 +17,7 @@ class Renderer {
 private:
 
     // Variables
-    Window* window;
+    std::shared_ptr<Window> window;
 
     VkInstance instance = VK_NULL_HANDLE;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;

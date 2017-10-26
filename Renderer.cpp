@@ -14,7 +14,7 @@
 #include "QueueFamilyIndices.h"
 
 Renderer::Renderer(int width, int height) {
-    window = new Window(width, height);
+    window = std::make_shared<Window>(width, height);
     InitVulkan();
 }
 
