@@ -39,3 +39,7 @@ void Window::CleanUp() {
 
     glfwTerminate();
 }
+
+GLFWwindow* Window::GetGLFWwindow() {
+    return window;
+}

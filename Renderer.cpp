@@ -9,6 +9,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <cstring>
+#include <set>
 #include "Window.h"
 #include "QueueFamilyIndices.h"
 
@@ -24,14 +25,16 @@ Renderer::~Renderer() {
 void Renderer::InitVulkan() {
     CreateInstance();
     SetupDebugCallbacks();
+    CreateSurface();
     SetupPhysicalDevice();
     InitLogicalDevice();
 }
 
 void Renderer::DeInitVulkan() {
     DeInitLogicalDevice();
-    DestroyDebugReportCallbackEXT(vkInstance, callback, nullptr);
-    DeleteInstance();
+    DestroySurface();
+    DestroyDebugReportCallbackEXT(instance, callback, nullptr);
+    DestroyInstance();
 }
 
 void Renderer::CreateInstance() {
@@ -73,11 +76,11 @@ void Renderer::CreateInstance() {
     instanceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
     instanceCreateInfo.ppEnabledExtensionNames = extensions.data();
 
-    ErrorCheck(vkCreateInstance(&instanceCreateInfo, nullptr, &vkInstance));
+    ErrorCheck(vkCreateInstance(&instanceCreateInfo, nullptr, &instance));
 }
 
-void Renderer::DeleteInstance() {
-    vkDestroyInstance(vkInstance, nullptr);
+void Renderer::DestroyInstance() {
+    vkDestroyInstance(instance, nullptr);
 }
 
 bool Renderer::CheckAllValidationLayersSupported() {
@@ -140,7 +143,7 @@ void Renderer::SetupDebugCallbacks() {
     debugReportCallbackCreateInfoEXT.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
     debugReportCallbackCreateInfoEXT.pfnCallback = debugCallback;
 
-    if (CreateDebugReportCallbackEXT(vkInstance, &debugReportCallbackCreateInfoEXT, nullptr, &callback) != VK_SUCCESS) {
+    if (CreateDebugReportCallbackEXT(instance, &debugReportCallbackCreateInfoEXT, nullptr, &callback) != VK_SUCCESS) {
         throw std::runtime_error("failed to set up debug callback!");
     }
 #endif
@@ -174,23 +177,23 @@ bool Renderer::Run() {
 
 void Renderer::SetupPhysicalDevice() {
     uint32_t deviceCount = 0;
-    vkEnumeratePhysicalDevices(vkInstance, &deviceCount, nullptr);
+    vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
 
     if (deviceCount == 0) {
         throw std::runtime_error("failed to find GPUs with Vulkan support!");
     }
 
     std::vector<VkPhysicalDevice> devices(deviceCount);
-    vkEnumeratePhysicalDevices(vkInstance, &deviceCount, devices.data());
+    vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
     for (const auto& device : devices) {
         if (IsDeviceSuitable(device)) {
-            vkPhysicalDevice = device;
+            physicalDevice = device;
             break;
         }
     }
 
-    if (vkPhysicalDevice == VK_NULL_HANDLE) {
+    if (physicalDevice == VK_NULL_HANDLE) {
         throw std::runtime_error("failed to find a suitable GPU!");
     }
 }
@@ -198,7 +201,7 @@ void Renderer::SetupPhysicalDevice() {
 bool Renderer::IsDeviceSuitable(VkPhysicalDevice vkPhysicalDevice) {
     VkPhysicalDeviceProperties deviceProperties;
     VkPhysicalDeviceFeatures deviceFeatures;
-    QueueFamilyIndices indices = findQueueFamilies(vkPhysicalDevice);
+    QueueFamilyIndices indices = FindQueueFamilies(vkPhysicalDevice);
 
     vkGetPhysicalDeviceProperties(vkPhysicalDevice, &deviceProperties);
     vkGetPhysicalDeviceFeatures(vkPhysicalDevice, &deviceFeatures);
@@ -208,7 +211,7 @@ bool Renderer::IsDeviceSuitable(VkPhysicalDevice vkPhysicalDevice) {
            && indices.isComplete();
 }
 
-QueueFamilyIndices Renderer::findQueueFamilies(VkPhysicalDevice vkPhysicalDevice) {
+QueueFamilyIndices Renderer::FindQueueFamilies(VkPhysicalDevice vkPhysicalDevice) {
     QueueFamilyIndices indices;
 
     uint32_t queueFamilyCount = 0;
@@ -219,8 +222,15 @@ QueueFamilyIndices Renderer::findQueueFamilies(VkPhysicalDevice vkPhysicalDevice
 
     int queueIndex = 0;
     for(const auto& queueFamily : queueFamilies) {
-        if(queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT){
-            indices.setGraphicsFamily(queueIndex);
+        if (queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+            indices.SetGraphicsFamily(queueIndex);
+        }
+
+        VkBool32 presentSupport = false;
+        vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, queueIndex, surface, &presentSupport);
+
+        if (queueFamily.queueCount > 0 && presentSupport) {
+            indices.SetPresentFamily(queueIndex);
         }
 
         if (indices.isComplete()) {
@@ -234,22 +244,28 @@ QueueFamilyIndices Renderer::findQueueFamilies(VkPhysicalDevice vkPhysicalDevice
 }
 
 void Renderer::InitLogicalDevice() {
-    QueueFamilyIndices indices = findQueueFamilies(vkPhysicalDevice);
+    QueueFamilyIndices indices = FindQueueFamilies(physicalDevice);
+
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfoVector;
+    std::set<int> uniqueQueueFamilies = {indices.GetGraphicsFamily(), indices.GetPresentFamily()};
 
     float queuePriority = 1.0f;
 
-    VkDeviceQueueCreateInfo queueCreateInfo {};
-    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queueCreateInfo.queueFamilyIndex = indices.getGraphicsFamily();
-    queueCreateInfo.queueCount = 1;
-    queueCreateInfo.pQueuePriorities = &queuePriority;
+    for (int queueFamily : uniqueQueueFamilies) {
+        VkDeviceQueueCreateInfo queueCreateInfo = {};
+        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queueCreateInfo.queueFamilyIndex = queueFamily;
+        queueCreateInfo.queueCount = 1;
+        queueCreateInfo.pQueuePriorities = &queuePriority;
+        queueCreateInfoVector.push_back(queueCreateInfo);
+    }
 
     VkPhysicalDeviceFeatures deviceFeatures {};
 
     VkDeviceCreateInfo deviceCreateInfo {};
     deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
-    deviceCreateInfo.queueCreateInfoCount = 1;
+    deviceCreateInfo.pQueueCreateInfos = queueCreateInfoVector.data();
+    deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfoVector.size());
     deviceCreateInfo.pEnabledFeatures = &deviceFeatures;
 
     deviceCreateInfo.enabledExtensionCount = 0;
@@ -261,13 +277,24 @@ void Renderer::InitLogicalDevice() {
     deviceCreateInfo.enabledLayerCount = 0;
 #endif
 
-    ErrorCheck(vkCreateDevice(vkPhysicalDevice, &deviceCreateInfo, nullptr, &vkDevice));
+    ErrorCheck(vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &device));
 
-    vkGetDeviceQueue(vkDevice, indices.getGraphicsFamily(), 0, &graphicsQueue);
+    vkGetDeviceQueue(device, indices.GetGraphicsFamily(), 0, &graphicsQueue);
+    vkGetDeviceQueue(device, indices.GetPresentFamily(), 0, &presentQueue);
 }
 
 void Renderer::DeInitLogicalDevice() {
-    vkDestroyDevice(vkDevice, nullptr);
+    vkDestroyDevice(device, nullptr);
+}
+
+void Renderer::CreateSurface() {
+    if (glfwCreateWindowSurface(instance, window->GetGLFWwindow(), nullptr, &surface) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create window surface!");
+    }
+}
+
+void Renderer::DestroySurface() {
+    vkDestroySurfaceKHR(instance, surface, nullptr);
 }
 
 

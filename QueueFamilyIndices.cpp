@@ -5,13 +5,21 @@
 #include "QueueFamilyIndices.h"
 
 bool QueueFamilyIndices::isComplete() {
-    return graphicsFamily >= 0;
+    return graphicsFamily >= 0 && presentFamily >= 0;
 }
 
-int QueueFamilyIndices::getGraphicsFamily() {
+int QueueFamilyIndices::GetGraphicsFamily() const {
     return graphicsFamily;
 }
 
-void QueueFamilyIndices::setGraphicsFamily(int graphicsFamily) {
+void QueueFamilyIndices::SetGraphicsFamily(int graphicsFamily) {
     this->graphicsFamily = graphicsFamily;
+}
+
+int QueueFamilyIndices::GetPresentFamily() const {
+    return presentFamily;
+}
+
+void QueueFamilyIndices::SetPresentFamily(int presentFamily) {
+    this->presentFamily = presentFamily;
 }

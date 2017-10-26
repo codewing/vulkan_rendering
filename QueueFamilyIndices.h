@@ -9,14 +9,19 @@
 class QueueFamilyIndices {
 
 public:
-    const int FAMILY_NOT_FOUND = -1;
+    const int NOT_FOUND_OR_UNSET = -1;
 
     bool isComplete();
-    int getGraphicsFamily();
-    void setGraphicsFamily(int graphicsFamily);
+
+    int GetGraphicsFamily() const;
+    void SetGraphicsFamily(int graphicsFamily);
+
+    int GetPresentFamily() const;
+    void SetPresentFamily(int presentFamily);
 
 private:
-    int graphicsFamily = FAMILY_NOT_FOUND;
+    int graphicsFamily = NOT_FOUND_OR_UNSET;
+    int presentFamily = NOT_FOUND_OR_UNSET;
 
 };
 

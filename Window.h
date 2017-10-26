@@ -23,6 +23,7 @@ public:
     Window(int width, int height);
 
     bool Update();
+    GLFWwindow* GetGLFWwindow();
 
     ~Window();
 };

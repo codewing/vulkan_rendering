@@ -19,12 +19,14 @@ private:
     // Variables
     Window* window;
 
-    VkInstance vkInstance = VK_NULL_HANDLE;
-    VkPhysicalDevice vkPhysicalDevice = VK_NULL_HANDLE;
-    VkDevice vkDevice = VK_NULL_HANDLE;
+    VkInstance instance = VK_NULL_HANDLE;
+    VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+    VkDevice device = VK_NULL_HANDLE;
 
     VkQueue graphicsQueue = VK_NULL_HANDLE;
+    VkQueue presentQueue = VK_NULL_HANDLE;
 
+    VkSurfaceKHR surface = VK_NULL_HANDLE;
 
     VkDebugReportCallbackEXT callback = VK_NULL_HANDLE;
 
@@ -35,7 +37,10 @@ private:
     void DeInitVulkan();
 
     void CreateInstance();
-    void DeleteInstance();
+    void DestroyInstance();
+
+    void CreateSurface();
+    void DestroySurface();
 
     void SetupPhysicalDevice();
 
@@ -52,7 +57,7 @@ private:
     void DestroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT callback, const VkAllocationCallbacks* pAllocator);
 
     bool IsDeviceSuitable(VkPhysicalDevice vkPhysicalDevice);
-    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice vkPhysicalDevice);
+    QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice vkPhysicalDevice);
 
 public:
 
