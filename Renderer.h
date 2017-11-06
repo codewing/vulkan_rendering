@@ -8,6 +8,7 @@
 #include <vulkan/vulkan.h>
 #include <vector>
 #include <memory>
+#include "SwapChainSupportDetails.h"
 
 class Window;
 class QueueFamilyIndices;
@@ -31,6 +32,7 @@ private:
     VkDebugReportCallbackEXT callback = VK_NULL_HANDLE;
 
     const std::vector<const char*> validationLayers = {"VK_LAYER_LUNARG_standard_validation"};
+    const std::vector<const char*> deviceExtensions  = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
     // Methods
     void InitVulkan();
@@ -51,13 +53,16 @@ private:
     std::vector<const char*> GetRequiredExtensions();
 
     // Debug callbacks
+    bool IsDeviceSuitable(VkPhysicalDevice vkPhysicalDevice);
+    bool CheckDeviceExtensionSupport(VkPhysicalDevice vkPhysicalDevice);
+    QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice vkPhysicalDevice);
+
+    SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
+
     void SetupDebugCallbacks();
     static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objType, uint64_t obj, size_t location, int32_t code, const char* layerPrefix, const char* msg, void* userData);
     VkResult CreateDebugReportCallbackEXT(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugReportCallbackEXT* pCallback);
     void DestroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT callback, const VkAllocationCallbacks* pAllocator);
-
-    bool IsDeviceSuitable(VkPhysicalDevice vkPhysicalDevice);
-    QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice vkPhysicalDevice);
 
 public:
 

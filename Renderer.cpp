@@ -53,17 +53,9 @@ void Renderer::CreateInstance() {
     applicationInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
     applicationInfo.apiVersion = VK_API_VERSION_1_0;
 
-    // Get extensions via GLFW
-    unsigned int glfwExtensionCount = 0;
-    const char** glfwExtensions;
-
-    glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-
     VkInstanceCreateInfo instanceCreateInfo {};
     instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     instanceCreateInfo.pApplicationInfo = &applicationInfo;
-    instanceCreateInfo.enabledExtensionCount = glfwExtensionCount;
-    instanceCreateInfo.ppEnabledExtensionNames = glfwExtensions;
 
 #ifdef BUILD_ENABLE_VULKAN_DEBUG
     instanceCreateInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
@@ -114,8 +106,7 @@ std::vector<const char *> Renderer::GetRequiredExtensions() {
     std::vector<const char*> extensions;
 
     unsigned int glfwExtensionCount = 0;
-    const char** glfwExtensions;
-    glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+    const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
     for (unsigned int i = 0; i < glfwExtensionCount; i++) {
         extensions.push_back(glfwExtensions[i]);
@@ -199,16 +190,11 @@ void Renderer::SetupPhysicalDevice() {
 }
 
 bool Renderer::IsDeviceSuitable(VkPhysicalDevice vkPhysicalDevice) {
-    VkPhysicalDeviceProperties deviceProperties;
-    VkPhysicalDeviceFeatures deviceFeatures;
     QueueFamilyIndices indices = FindQueueFamilies(vkPhysicalDevice);
 
-    vkGetPhysicalDeviceProperties(vkPhysicalDevice, &deviceProperties);
-    vkGetPhysicalDeviceFeatures(vkPhysicalDevice, &deviceFeatures);
+    bool extensionsSupported = CheckDeviceExtensionSupport(vkPhysicalDevice);
 
-    return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
-           && deviceFeatures.geometryShader
-           && indices.isComplete();
+    return indices.isComplete() && extensionsSupported;
 }
 
 QueueFamilyIndices Renderer::FindQueueFamilies(VkPhysicalDevice vkPhysicalDevice) {
@@ -268,7 +254,8 @@ void Renderer::InitLogicalDevice() {
     deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfoVector.size());
     deviceCreateInfo.pEnabledFeatures = &deviceFeatures;
 
-    deviceCreateInfo.enabledExtensionCount = 0;
+    deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
+    deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
 #if BUILD_ENABLE_VULKAN_DEBUG
     deviceCreateInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
@@ -295,6 +282,27 @@ void Renderer::CreateSurface() {
 
 void Renderer::DestroySurface() {
     vkDestroySurfaceKHR(instance, surface, nullptr);
+}
+
+bool Renderer::CheckDeviceExtensionSupport(VkPhysicalDevice vkPhysicalDevice) {
+
+    uint32_t extensionCount;
+    vkEnumerateDeviceExtensionProperties(vkPhysicalDevice, nullptr, &extensionCount, nullptr);
+
+    std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+    vkEnumerateDeviceExtensionProperties(vkPhysicalDevice, nullptr, &extensionCount, availableExtensions.data());
+
+    std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+
+    for (const auto& extension : availableExtensions) {
+        requiredExtensions.erase(extension.extensionName);
+    }
+
+    return requiredExtensions.empty();
+}
+
+SwapChainSupportDetails Renderer::QuerySwapChainSupport(VkPhysicalDevice device) {
+    return SwapChainSupportDetails();
 }
 
 

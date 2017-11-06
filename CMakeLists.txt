@@ -3,7 +3,7 @@ project(vulkan_voxel)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(SOURCE_FILES main.cpp Window.cpp Window.h Renderer.cpp Renderer.h BUILD_OPTIONS.h Utilities.cpp Utilities.h QueueFamilyIndices.cpp QueueFamilyIndices.h)
+set(SOURCE_FILES main.cpp Window.cpp Window.h Renderer.cpp Renderer.h BUILD_OPTIONS.h Utilities.cpp Utilities.h QueueFamilyIndices.cpp QueueFamilyIndices.h SwapChainSupportDetails.cpp SwapChainSupportDetails.h)
 add_executable(vulkan_voxel ${SOURCE_FILES})
 
 #variables for libs
