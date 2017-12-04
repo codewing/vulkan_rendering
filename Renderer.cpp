@@ -31,9 +31,11 @@ void Renderer::InitVulkan() {
     InitLogicalDevice();
     CreateSwapchain();
     GetSwapchainImages();
+    CreateImageViews();
 }
 
 void Renderer::DeInitVulkan() {
+    DestroyImageViews();
     DestroySwapchain();
     DeInitLogicalDevice();
     DestroySurface();
@@ -341,8 +343,8 @@ void Renderer::CreateSwapchain() {
     ErrorCheck(vkCreateSwapchainKHR(device, &swapchainCreateInfo, nullptr, &swapchain));
 
     // save the format and the extent
-    swapChainImageFormat = surfaceFormat.format;
-    swapChainExtent = extent;
+    swapchainImageFormat = surfaceFormat.format;
+    swapchainExtent = extent;
 }
 
 void Renderer::DestroySwapchain() {
@@ -354,6 +356,37 @@ void Renderer::GetSwapchainImages() {
     vkGetSwapchainImagesKHR(device, swapchain, &imageCount, nullptr);
     swapchainImages.resize(imageCount);
     vkGetSwapchainImagesKHR(device, swapchain, &imageCount, swapchainImages.data());
+}
+
+void Renderer::CreateImageViews() {
+    swapchainImageViews.resize(swapchainImages.size());
+
+    for (size_t i = 0; i < swapchainImages.size(); i++) {
+        VkImageViewCreateInfo imageViewCreateInfo {};
+        imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        imageViewCreateInfo.image = swapchainImages[i];
+        imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        imageViewCreateInfo.format = swapchainImageFormat;
+
+        imageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+        imageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+        imageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+        imageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+
+        imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
+        imageViewCreateInfo.subresourceRange.levelCount = 1;
+        imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
+        imageViewCreateInfo.subresourceRange.layerCount = 1;
+
+        ErrorCheck(vkCreateImageView(device, &imageViewCreateInfo, nullptr, &swapchainImageViews[i]));
+    }
+}
+
+void Renderer::DestroyImageViews() {
+    for (auto imageView : swapchainImageViews) {
+        vkDestroyImageView(device, imageView, nullptr);
+    }
 }
 
 /// check whether the required extensions are present
@@ -448,6 +481,3 @@ VkExtent2D Renderer::ChooseSwapchainExtent(const VkSurfaceCapabilitiesKHR &capab
         return actualExtent;
     }
 }
-
-
-

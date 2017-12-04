@@ -29,8 +29,9 @@ private:
     VkSurfaceKHR surface = VK_NULL_HANDLE;
     VkSwapchainKHR swapchain = VK_NULL_HANDLE;
     std::vector<VkImage> swapchainImages;
-    VkFormat swapChainImageFormat;
-    VkExtent2D swapChainExtent;
+    std::vector<VkImageView> swapchainImageViews;
+    VkFormat swapchainImageFormat;
+    VkExtent2D swapchainExtent;
 
     VkDebugReportCallbackEXT callback = VK_NULL_HANDLE;
 
@@ -55,6 +56,8 @@ private:
     void CreateSwapchain();
     void DestroySwapchain();
     void GetSwapchainImages();
+    void CreateImageViews();
+    void DestroyImageViews();
 
     bool CheckAllValidationLayersSupported();
     std::vector<const char*> GetRequiredExtensions();
