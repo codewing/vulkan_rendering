@@ -13,16 +13,16 @@ public:
 
     bool isComplete();
 
+private:
+    int graphicsFamily = NOT_FOUND_OR_UNSET;
+    int presentFamily = NOT_FOUND_OR_UNSET;
+
+public:
     int GetGraphicsFamily() const;
     void SetGraphicsFamily(int graphicsFamily);
 
     int GetPresentFamily() const;
     void SetPresentFamily(int presentFamily);
-
-private:
-    int graphicsFamily = NOT_FOUND_OR_UNSET;
-    int presentFamily = NOT_FOUND_OR_UNSET;
-
 };
 
 

@@ -8,7 +8,6 @@
 #include <GLFW/glfw3.h>
 
 Window::Window(int width, int height) : WINDOW_WIDTH(width), WINDOW_HEIGHT(height) {
-
     running = true;
 
     InitWindow();
@@ -42,4 +41,12 @@ void Window::CleanUp() {
 
 GLFWwindow* Window::GetGLFWwindow() {
     return window;
+}
+
+const int Window::GetWidth() const {
+    return WINDOW_WIDTH;
+}
+
+const int Window::GetHeight() const {
+    return WINDOW_HEIGHT;
 }

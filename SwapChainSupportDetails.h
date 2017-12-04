@@ -9,9 +9,7 @@
 #include <vulkan/vulkan.h>
 #include <vector>
 
-class SwapChainSupportDetails {
-
-private:
+struct SwapChainSupportDetails {
     VkSurfaceCapabilitiesKHR capabilities;
     std::vector<VkSurfaceFormatKHR> formats;
     std::vector<VkPresentModeKHR> presentModes;

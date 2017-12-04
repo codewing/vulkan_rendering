@@ -16,7 +16,6 @@ class QueueFamilyIndices;
 class Renderer {
 
 private:
-
     // Variables
     std::shared_ptr<Window> window;
 
@@ -28,6 +27,10 @@ private:
     VkQueue presentQueue = VK_NULL_HANDLE;
 
     VkSurfaceKHR surface = VK_NULL_HANDLE;
+    VkSwapchainKHR swapchain = VK_NULL_HANDLE;
+    std::vector<VkImage> swapchainImages;
+    VkFormat swapChainImageFormat;
+    VkExtent2D swapChainExtent;
 
     VkDebugReportCallbackEXT callback = VK_NULL_HANDLE;
 
@@ -49,6 +52,10 @@ private:
     void InitLogicalDevice();
     void DeInitLogicalDevice();
 
+    void CreateSwapchain();
+    void DestroySwapchain();
+    void GetSwapchainImages();
+
     bool CheckAllValidationLayersSupported();
     std::vector<const char*> GetRequiredExtensions();
 
@@ -57,7 +64,10 @@ private:
     bool CheckDeviceExtensionSupport(VkPhysicalDevice vkPhysicalDevice);
     QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice vkPhysicalDevice);
 
-    SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
+    SwapChainSupportDetails QuerySwapchainSupport(VkPhysicalDevice device);
+    VkSurfaceFormatKHR ChooseSwapchainSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
+    VkPresentModeKHR ChooseSwapchainPresentMode(const std::vector<VkPresentModeKHR> availablePresentModes);
+    VkExtent2D ChooseSwapchainExtent(const VkSurfaceCapabilitiesKHR &capabilities);
 
     void SetupDebugCallbacks();
     static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objType, uint64_t obj, size_t location, int32_t code, const char* layerPrefix, const char* msg, void* userData);

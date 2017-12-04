@@ -21,11 +21,14 @@ private:
 
 public:
     Window(int width, int height);
+    ~Window();
 
     bool Update();
     GLFWwindow* GetGLFWwindow();
 
-    ~Window();
+    const int GetWidth() const;
+
+    const int GetHeight() const;
 };
 
 
