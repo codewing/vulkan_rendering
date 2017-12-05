@@ -389,6 +389,11 @@ void Renderer::DestroyImageViews() {
     }
 }
 
+void Renderer::CreateGraphicsPipeline() {
+    auto vertShaderCode = readFile("shaders/vert.spv");
+    auto fragShaderCode = readFile("shaders/frag.spv");
+}
+
 /// check whether the required extensions are present
 bool Renderer::CheckDeviceExtensionSupport(VkPhysicalDevice vkPhysicalDevice) {
 

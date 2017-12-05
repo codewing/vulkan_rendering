@@ -59,6 +59,8 @@ private:
     void CreateImageViews();
     void DestroyImageViews();
 
+    void CreateGraphicsPipeline();
+
     bool CheckAllValidationLayersSupported();
     std::vector<const char*> GetRequiredExtensions();
 

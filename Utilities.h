@@ -7,7 +7,10 @@
 #define VULKAN_VOXEL_UTILITIES_H
 
 #include <vulkan/vulkan.h>
+#include <vector>
+#include <string>
 
 void ErrorCheck(VkResult result);
+std::vector<char> readFile(const std::string& filename);
 
 #endif //VULKAN_VOXEL_UTILITIES_H

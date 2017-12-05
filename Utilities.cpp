@@ -5,6 +5,7 @@
 
 #include "Utilities.h"
 #include <iostream>
+#include <fstream>
 
 #if BUILD_ENABLE_VULKAN_DEBUG
 
@@ -79,9 +80,21 @@ void ErrorCheck(VkResult result)
         static_assert("Vulkan runtime error.");
     }
 }
-
 #else
-
-void ErrorCheck(VkResult result){}
-
+    void ErrorCheck(VkResult result){}
 #endif //BUILD_ENABLE_VULKAN_DEBUG
+
+std::vector<char> readFile(const std::string &filename) {
+    std::ifstream file(filename, std::ios::ate | std::ios::binary);
+
+    if (!file.is_open()) {
+        throw std::runtime_error("failed to open file!");
+    }
+
+    size_t fileSize = (size_t) file.tellg();
+    std::vector<char> buffer(fileSize);
+
+    file.close();
+
+    return buffer;
+}
