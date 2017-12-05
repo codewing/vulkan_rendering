@@ -1,0 +1,1 @@
+for %%f in (shader.*) do %VULKAN_SDK%\Bin32\glslangValidator.exe -V %%f
