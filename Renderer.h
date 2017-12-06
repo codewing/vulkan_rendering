@@ -33,6 +33,8 @@ private:
     VkFormat swapchainImageFormat;
     VkExtent2D swapchainExtent;
 
+    VkPipelineLayout pipelineLayout;
+
     VkDebugReportCallbackEXT callback = VK_NULL_HANDLE;
 
     const std::vector<const char*> validationLayers = {"VK_LAYER_LUNARG_standard_validation"};
@@ -60,6 +62,7 @@ private:
     void DestroyImageViews();
 
     void CreateGraphicsPipeline();
+    void DestroyGraphicsPipeline();
 
     bool CheckAllValidationLayersSupported();
     std::vector<const char*> GetRequiredExtensions();
@@ -78,6 +81,7 @@ private:
     static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objType, uint64_t obj, size_t location, int32_t code, const char* layerPrefix, const char* msg, void* userData);
     VkResult CreateDebugReportCallbackEXT(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugReportCallbackEXT* pCallback);
     void DestroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT callback, const VkAllocationCallbacks* pAllocator);
+    VkShaderModule CreateShaderModule(const std::vector<char>& code);
 
 public:
 
