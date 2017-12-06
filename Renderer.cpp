@@ -32,6 +32,7 @@ void Renderer::InitVulkan() {
     CreateSwapchain();
     GetSwapchainImages();
     CreateImageViews();
+    CreateGraphicsPipeline();
 }
 
 void Renderer::DeInitVulkan() {
@@ -392,6 +393,7 @@ void Renderer::DestroyImageViews() {
 void Renderer::CreateGraphicsPipeline() {
     auto vertShaderCode = readFile("shaders/vert.spv");
     auto fragShaderCode = readFile("shaders/frag.spv");
+
 }
 
 /// check whether the required extensions are present

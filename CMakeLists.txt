@@ -9,7 +9,6 @@ add_executable(vulkan_voxel ${SOURCE_FILES})
 #variables for libs
 set(GLFW_DIR libs/glfw)
 
-
 add_subdirectory(${GLFW_DIR})
 include_directories(${GLFW_DIR}/include)
 target_link_libraries(vulkan_voxel glfw ${GLFW_LIBRARIES})
@@ -19,3 +18,7 @@ if (Vulkan_FOUND)
     include_directories(${Vulkan_INCLUDE_DIRS})
     target_link_libraries(vulkan_voxel ${Vulkan_LIBRARIES})
 endif (Vulkan_FOUND)
+
+# copying the compiled shaders to the output dir
+file(GLOB SHADERS "shaders/*.spv")
+file(COPY ${SHADERS} DESTINATION shaders)
