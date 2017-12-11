@@ -38,6 +38,8 @@ private:
     VkPipelineLayout pipelineLayout;
     VkPipeline graphicsPipeline;
 
+    VkCommandPool commandPool;
+
     VkDebugReportCallbackEXT callback = VK_NULL_HANDLE;
 
     const std::vector<const char*> validationLayers = {"VK_LAYER_LUNARG_standard_validation"};
@@ -71,6 +73,9 @@ private:
 
     void CreateFramebuffers();
     void DestroyFramebuffers();
+
+    void CreateCommandPool();
+    void DestroyCommandPool();
 
     bool CheckAllValidationLayersSupported();
     std::vector<const char*> GetRequiredExtensions();

@@ -35,9 +35,11 @@ void Renderer::InitVulkan() {
     CreateRenderPass();
     CreateGraphicsPipeline();
     CreateFramebuffers();
+    CreateCommandPool();
 }
 
 void Renderer::DeInitVulkan() {
+    DestroyCommandPool();
     DestroyFramebuffers();
     DestroyGraphicsPipeline();
     DestroyRenderPass();
@@ -603,6 +605,21 @@ void Renderer::DestroyFramebuffers() {
     for (auto framebuffer : swapchainFramebuffers) {
         vkDestroyFramebuffer(device, framebuffer, nullptr);
     }
+}
+
+void Renderer::CreateCommandPool() {
+    QueueFamilyIndices queueFamilyIndices = FindQueueFamilies(physicalDevice);
+
+    VkCommandPoolCreateInfo poolInfo {};
+    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    poolInfo.queueFamilyIndex = static_cast<uint32_t>(queueFamilyIndices.GetGraphicsFamily());
+    poolInfo.flags = 0; // Optional
+
+    ErrorCheck(vkCreateCommandPool(device, &poolInfo, nullptr, &commandPool));
+}
+
+void Renderer::DestroyCommandPool() {
+    vkDestroyCommandPool(device, commandPool, nullptr);
 }
 
 /// check whether the required extensions are present
