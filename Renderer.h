@@ -32,6 +32,7 @@ private:
     std::vector<VkImageView> swapchainImageViews;
     VkFormat swapchainImageFormat;
     VkExtent2D swapchainExtent;
+    std::vector<VkFramebuffer> swapchainFramebuffers;
 
     VkRenderPass renderPass;
     VkPipelineLayout pipelineLayout;
@@ -67,6 +68,9 @@ private:
     void DestroyRenderPass();
     void CreateGraphicsPipeline();
     void DestroyGraphicsPipeline();
+
+    void CreateFramebuffers();
+    void DestroyFramebuffers();
 
     bool CheckAllValidationLayersSupported();
     std::vector<const char*> GetRequiredExtensions();

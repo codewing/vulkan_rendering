@@ -34,9 +34,11 @@ void Renderer::InitVulkan() {
     CreateImageViews();
     CreateRenderPass();
     CreateGraphicsPipeline();
+    CreateFramebuffers();
 }
 
 void Renderer::DeInitVulkan() {
+    DestroyFramebuffers();
     DestroyGraphicsPipeline();
     DestroyRenderPass();
     DestroyImageViews();
@@ -574,6 +576,33 @@ void Renderer::CreateRenderPass() {
 
 void Renderer::DestroyRenderPass() {
     vkDestroyRenderPass(device, renderPass, nullptr);
+}
+
+void Renderer::CreateFramebuffers() {
+    swapchainFramebuffers.resize(swapchainImageViews.size());
+
+    for (size_t i = 0; i < swapchainImageViews.size(); i++) {
+        VkImageView attachments[] = {
+                swapchainImageViews[i]
+        };
+
+        VkFramebufferCreateInfo framebufferInfo = {};
+        framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        framebufferInfo.renderPass = renderPass;
+        framebufferInfo.attachmentCount = 1;
+        framebufferInfo.pAttachments = attachments;
+        framebufferInfo.width = swapchainExtent.width;
+        framebufferInfo.height = swapchainExtent.height;
+        framebufferInfo.layers = 1;
+
+        ErrorCheck(vkCreateFramebuffer(device, &framebufferInfo, nullptr, &swapchainFramebuffers[i]));
+    }
+}
+
+void Renderer::DestroyFramebuffers() {
+    for (auto framebuffer : swapchainFramebuffers) {
+        vkDestroyFramebuffer(device, framebuffer, nullptr);
+    }
 }
 
 /// check whether the required extensions are present
