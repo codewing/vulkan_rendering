@@ -61,6 +61,7 @@ private:
     void CreateImageViews();
     void DestroyImageViews();
 
+    void CreateRenderPass();
     void CreateGraphicsPipeline();
     void DestroyGraphicsPipeline();
 
