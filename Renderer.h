@@ -35,6 +35,7 @@ private:
 
     VkRenderPass renderPass;
     VkPipelineLayout pipelineLayout;
+    VkPipeline graphicsPipeline;
 
     VkDebugReportCallbackEXT callback = VK_NULL_HANDLE;
 
