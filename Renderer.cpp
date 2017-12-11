@@ -38,6 +38,7 @@ void Renderer::InitVulkan() {
 
 void Renderer::DeInitVulkan() {
     DestroyGraphicsPipeline();
+    DestroyRenderPass();
     DestroyImageViews();
     DestroySwapchain();
     DeInitLogicalDevice();
@@ -533,8 +534,26 @@ void Renderer::CreateRenderPass() {
 
     // Subpasses
     VkAttachmentReference colorAttachmentRef {};
-    colorAttachmentRef.attachment = 0;
+    colorAttachmentRef.attachment = 0; // fragment shader out parameter
     colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+    VkSubpassDescription subpass {};
+    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    subpass.colorAttachmentCount = 1;
+    subpass.pColorAttachments = &colorAttachmentRef;
+
+    VkRenderPassCreateInfo renderPassInfo {};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderPassInfo.attachmentCount = 1;
+    renderPassInfo.pAttachments = &colorAttachment;
+    renderPassInfo.subpassCount = 1;
+    renderPassInfo.pSubpasses = &subpass;
+
+    ErrorCheck(vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass));
+}
+
+void Renderer::DestroyRenderPass() {
+    vkDestroyRenderPass(device, renderPass, nullptr);
 }
 
 /// check whether the required extensions are present

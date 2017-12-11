@@ -33,6 +33,7 @@ private:
     VkFormat swapchainImageFormat;
     VkExtent2D swapchainExtent;
 
+    VkRenderPass renderPass;
     VkPipelineLayout pipelineLayout;
 
     VkDebugReportCallbackEXT callback = VK_NULL_HANDLE;
@@ -62,6 +63,7 @@ private:
     void DestroyImageViews();
 
     void CreateRenderPass();
+    void DestroyRenderPass();
     void CreateGraphicsPipeline();
     void DestroyGraphicsPipeline();
 
