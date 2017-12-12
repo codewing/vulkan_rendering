@@ -41,6 +41,9 @@ private:
     VkCommandPool commandPool;
     std::vector<VkCommandBuffer> commandBuffers;
 
+    VkSemaphore imageAvailableSemaphore;
+    VkSemaphore renderFinishedSemaphore;
+
     VkDebugReportCallbackEXT callback = VK_NULL_HANDLE;
 
     const std::vector<const char*> validationLayers = {"VK_LAYER_LUNARG_standard_validation"};
@@ -78,6 +81,11 @@ private:
     void CreateCommandPool();
     void DestroyCommandPool();
     void CreateCommandBuffers();
+
+    void DrawFrame();
+
+    void CreateSemaphores();
+    void DestroySemaphores();
 
     bool CheckAllValidationLayersSupported();
     std::vector<const char*> GetRequiredExtensions();
