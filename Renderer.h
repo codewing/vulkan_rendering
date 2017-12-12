@@ -39,6 +39,7 @@ private:
     VkPipeline graphicsPipeline;
 
     VkCommandPool commandPool;
+    std::vector<VkCommandBuffer> commandBuffers;
 
     VkDebugReportCallbackEXT callback = VK_NULL_HANDLE;
 
@@ -76,6 +77,7 @@ private:
 
     void CreateCommandPool();
     void DestroyCommandPool();
+    void CreateCommandBuffers();
 
     bool CheckAllValidationLayersSupported();
     std::vector<const char*> GetRequiredExtensions();
