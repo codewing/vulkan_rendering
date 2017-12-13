@@ -47,7 +47,7 @@ file(GLOB_RECURSE GLSL_SOURCE_FILES
 foreach(GLSL_FILE ${GLSL_SOURCE_FILES})
     get_filename_component(FILE_NAME ${GLSL_FILE} NAME)
     set(SPIRV_FILE "${PROJECT_BINARY_DIR}/shaders/${FILE_NAME}.spv")
-        message("${GLSL_VALIDATOR} -V ${GLSL_FILE} -o ${SPIRV_FILE}")
+    # message("${GLSL_VALIDATOR} -V ${GLSL_FILE} -o ${SPIRV_FILE}")
     add_custom_command(
             OUTPUT ${SPIRV_FILE}
             COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/shaders/"
