@@ -406,8 +406,8 @@ void Renderer::DestroyImageViews() {
 
 void Renderer::CreateGraphicsPipeline() {
 
-    auto vertShaderCode = readFile("shaders/vert.spv");
-    auto fragShaderCode = readFile("shaders/frag.spv");
+    auto vertShaderCode = readFile("shaders/shader.vert.spv");
+    auto fragShaderCode = readFile("shaders/shader.frag.spv");
 
     VkShaderModule vertShaderModule = CreateShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = CreateShaderModule(fragShaderCode);
