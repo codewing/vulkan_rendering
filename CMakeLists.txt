@@ -3,7 +3,11 @@ project(vulkan_voxel)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(SOURCE_FILES main.cpp Window.cpp Window.h Renderer.cpp Renderer.h BUILD_OPTIONS.h Utilities.cpp Utilities.h QueueFamilyIndices.cpp QueueFamilyIndices.h SwapChainSupportDetails.h)
+file(GLOB SRC
+        "src/*.h"
+        "src/*.cpp"
+        )
+set(SOURCE_FILES ${SRC})
 add_executable(vulkan_voxel ${SOURCE_FILES})
 
 #variables for libs
