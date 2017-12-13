@@ -44,6 +44,5 @@ foreach(SHADER_SRC ${SHADERS_SRC})
     execute_process(COMMAND glslangValidator -V ${SHADER_SRC} -o ${SHADER_COMPILED}
             INPUT_FILE ${SHADER_SRC}
             OUTPUT_FILE ${SHADER_COMPILED}
-            WORKING_DIRECTORY ${VULKAN_SDK}/bin
-            RESULT_VARIABLE res_var)
+            WORKING_DIRECTORY ${VULKAN_SDK}/bin)
 endforeach()
