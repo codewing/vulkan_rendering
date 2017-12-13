@@ -30,19 +30,42 @@ endif (Vulkan_FOUND)
 ##### Compiling the Shaders  #####
 ##################################
 
-# make sure the shaders dir exists (cannot generate into it otherwise)
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/shaders)
-# gather all shaders
-file(GLOB SHADERS_SRC "shaders/shader.*")
+if (${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Windows")
+    set(GLSL_VALIDATOR "$ENV{VULKAN_SDK}/Bin/glslangValidator.exe")
+elseif(${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Linux")
+    set(GLSL_VALIDATOR "$ENV{VULKAN_SDK}/bin/glslangValidator")
+else()
+    message("Unsupported build platform")
+endif()
 
-foreach(SHADER_SRC ${SHADERS_SRC})
-    # get the type of the shader
-    string(REGEX MATCH "shader.([a-z]+)" IGNORED_OUTPUT ${SHADER_SRC})
-    # build the generated name
-    set(SHADER_COMPILED "${CMAKE_BINARY_DIR}/shaders/${CMAKE_MATCH_1}.spv")
-    # compile the shader
-    execute_process(COMMAND glslangValidator -V ${SHADER_SRC} -o ${SHADER_COMPILED}
-            INPUT_FILE ${SHADER_SRC}
-            OUTPUT_FILE ${SHADER_COMPILED}
-            WORKING_DIRECTORY ${VULKAN_SDK}/bin)
-endforeach()
+
+file(GLOB_RECURSE GLSL_SOURCE_FILES
+        "shaders/*.frag"
+        "shaders/*.vert"
+        )
+
+foreach(GLSL_FILE ${GLSL_SOURCE_FILES})
+    get_filename_component(FILE_NAME ${GLSL_FILE} NAME)
+    set(SPIRV_FILE "${PROJECT_BINARY_DIR}/shaders/${FILE_NAME}.spv")
+        message("${GLSL_VALIDATOR} -V ${GLSL_FILE} -o ${SPIRV_FILE}")
+    add_custom_command(
+            OUTPUT ${SPIRV_FILE}
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/shaders/"
+            COMMAND ${GLSL_VALIDATOR} -V ${GLSL_FILE} -o ${SPIRV_FILE}
+            DEPENDS ${GLSL_FILE})
+    list(APPEND SPIRV_BINARY_FILES ${SPIRV_FILE})
+endforeach(GLSL_FILE)
+
+add_custom_target(
+        Shaders
+        DEPENDS ${SPIRV_BINARY_FILES}
+)
+
+add_dependencies(${PROJECT_NAME} Shaders)
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/shaders/"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${PROJECT_BINARY_DIR}/shaders"
+        "${PROJECT_BINARY_DIR}/shaders"
+        )
