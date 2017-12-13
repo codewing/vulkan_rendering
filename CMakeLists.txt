@@ -23,6 +23,14 @@ if (Vulkan_FOUND)
     target_link_libraries(vulkan_voxel ${Vulkan_LIBRARIES})
 endif (Vulkan_FOUND)
 
-# copying the compiled shaders to the output dir
-file(GLOB SHADERS "shaders/*.spv")
-file(COPY ${SHADERS} DESTINATION shaders)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/shaders)
+file(GLOB SHADERS_SRC "shaders/shader.*")
+foreach(SHADER_SRC ${SHADERS_SRC})
+    string(REGEX MATCH "shader.([a-z]+)" IGNORED ${SHADER_SRC})
+    set(SHADER_COMPILED "${CMAKE_BINARY_DIR}/shaders/${CMAKE_MATCH_1}.spv")
+    execute_process(COMMAND glslangValidator -V ${SHADER_SRC} -o ${SHADER_COMPILED}
+            INPUT_FILE ${SHADER_SRC}
+            OUTPUT_FILE ${SHADER_COMPILED}
+            WORKING_DIRECTORY ${VULKAN_SDK}/bin
+            RESULT_VARIABLE res_var)
+endforeach()
