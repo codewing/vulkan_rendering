@@ -3,4 +3,5 @@
 ## Setup
 
 - Add the `VULKAN_SDK` variable to your environment so CMake can find Vulkan
-- Build the Project with `cmake .`
+- Generate the build configuration with `cmake .`
+- Build generated config folder with `make`
