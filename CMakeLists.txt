@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(SOURCE_FILES
         src/main.cpp
+        src/BUILD_OPTIONS.h
         src/Renderer.cpp src/Renderer.h
         src/QueueFamilyIndices.cpp
         src/QueueFamilyIndices.h
@@ -50,7 +51,7 @@ file(GLOB_RECURSE GLSL_SOURCE_FILES
 foreach (GLSL_FILE ${GLSL_SOURCE_FILES})
     get_filename_component(FILE_NAME ${GLSL_FILE} NAME)
     set(SPIRV_FILE "${PROJECT_BINARY_DIR}/shaders/${FILE_NAME}.spv")
-    # message("${GLSL_VALIDATOR} -V ${GLSL_FILE} -o ${SPIRV_FILE}")
+    message("${GLSL_VALIDATOR} -V ${GLSL_FILE} -o ${SPIRV_FILE}")
     add_custom_command(
             OUTPUT ${SPIRV_FILE}
             COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/shaders/"
@@ -66,9 +67,3 @@ add_custom_target(
 
 add_dependencies(${PROJECT_NAME} Shaders)
 
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/shaders/"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${PROJECT_BINARY_DIR}/shaders"
-        "${PROJECT_BINARY_DIR}/shaders"
-        )

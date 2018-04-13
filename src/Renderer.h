@@ -66,6 +66,7 @@ private:
 
     void CreateSwapchain();
     void DestroySwapchain();
+    void CleanupSwapchain();
     void GetSwapchainImages();
     void CreateImageViews();
     void DestroyImageViews();
@@ -112,6 +113,7 @@ public:
     ~Renderer();
 
     bool Run();
+    void RecreateSwapchain();
 
 };
 

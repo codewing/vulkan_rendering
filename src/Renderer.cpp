@@ -1,7 +1,7 @@
 //
 // Created by codewing on 20/10/2017.
 //
-#include "../BUILD_OPTIONS.h"
+#include "BUILD_OPTIONS.h"
 
 #include "Renderer.h"
 #include "Utilities.h"
@@ -15,7 +15,7 @@
 #include "QueueFamilyIndices.h"
 
 Renderer::Renderer(int width, int height) {
-    window = std::make_shared<Window>(width, height);
+    window = std::make_shared<Window>(this, width, height);
     InitVulkan();
 }
 
@@ -30,7 +30,6 @@ void Renderer::InitVulkan() {
     SetupPhysicalDevice();
     InitLogicalDevice();
     CreateSwapchain();
-    GetSwapchainImages();
     CreateImageViews();
     CreateRenderPass();
     CreateGraphicsPipeline();
@@ -41,16 +40,14 @@ void Renderer::InitVulkan() {
 }
 
 void Renderer::DeInitVulkan() {
+    CleanupSwapchain();
+
     DestroySemaphores();
     DestroyCommandPool();
-    DestroyFramebuffers();
-    DestroyGraphicsPipeline();
-    DestroyRenderPass();
-    DestroyImageViews();
-    DestroySwapchain();
+
     DeInitLogicalDevice();
-    DestroySurface();
     DestroyDebugReportCallbackEXT(instance, callback, nullptr);
+    DestroySurface();
     DestroyInstance();
 }
 
@@ -357,6 +354,8 @@ void Renderer::CreateSwapchain() {
 
     ErrorCheck(vkCreateSwapchainKHR(device, &swapchainCreateInfo, nullptr, &swapchain));
 
+    GetSwapchainImages();
+
     // save the format and the extent
     swapchainImageFormat = surfaceFormat.format;
     swapchainExtent = extent;
@@ -364,6 +363,32 @@ void Renderer::CreateSwapchain() {
 
 void Renderer::DestroySwapchain() {
     vkDestroySwapchainKHR(device, swapchain, nullptr);
+}
+
+void Renderer::RecreateSwapchain() {
+    int width, height;
+    glfwGetWindowSize(window->GetGLFWwindow(), &width, &height);
+    if (width == 0 || height == 0) return;
+
+    vkDeviceWaitIdle(device);
+
+    CleanupSwapchain();
+
+    CreateSwapchain();
+    CreateImageViews();
+    CreateRenderPass();
+    CreateGraphicsPipeline();
+    CreateFramebuffers();
+    CreateCommandBuffers();
+}
+
+void Renderer::CleanupSwapchain() {
+    DestroyFramebuffers();
+    vkFreeCommandBuffers(device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+    DestroyGraphicsPipeline();
+    DestroyRenderPass();
+    DestroyImageViews();
+    DestroySwapchain();
 }
 
 void Renderer::GetSwapchainImages() {
@@ -684,7 +709,14 @@ void Renderer::DestroyCommandPool() {
 
 void Renderer::DrawFrame() {
     uint32_t imageIndex;
-    vkAcquireNextImageKHR(device, swapchain, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+    VkResult result = vkAcquireNextImageKHR(device, swapchain, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+    // check whether the swapchain has changed
+    if (result == VK_ERROR_OUT_OF_DATE_KHR){
+        RecreateSwapchain();
+        return;
+    } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+        ErrorCheck(result);
+    }
 
     VkSubmitInfo submitInfo {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -716,7 +748,12 @@ void Renderer::DrawFrame() {
     presentInfo.pImageIndices = &imageIndex;
     presentInfo.pResults = nullptr; // Optional
 
-    vkQueuePresentKHR(presentQueue, &presentInfo);
+    result = vkQueuePresentKHR(presentQueue, &presentInfo);
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
+        RecreateSwapchain();
+    } else {
+        ErrorCheck(result);
+    }
 
     vkQueueWaitIdle(presentQueue);
 
@@ -816,8 +853,11 @@ VkExtent2D Renderer::ChooseSwapchainExtent(const VkSurfaceCapabilitiesKHR &capab
     if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
         return capabilities.currentExtent;
     } else {
-        VkExtent2D actualExtent = {static_cast<uint32_t>(window->GetWidth()),
-                                   static_cast<uint32_t>(window->GetHeight())};
+        int width, height;
+        glfwGetWindowSize(window->GetGLFWwindow(), &width, &height);
+
+        VkExtent2D actualExtent = {static_cast<uint32_t>(width),
+                                   static_cast<uint32_t>(height)};
 
         actualExtent.width = std::max(capabilities.minImageExtent.width,
                                       std::min(capabilities.maxImageExtent.width, actualExtent.width));
@@ -839,3 +879,5 @@ VkShaderModule Renderer::CreateShaderModule(const std::vector<char>& code) {
 
     return shaderModule;
 }
+
+

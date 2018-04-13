@@ -1,7 +1,7 @@
 //
 // Created by codewing on 20/10/2017.
 //
-#include "../BUILD_OPTIONS.h"
+#include "BUILD_OPTIONS.h"
 
 #include "Utilities.h"
 #include <iostream>
