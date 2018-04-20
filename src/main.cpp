@@ -1,7 +1,6 @@
 #include <iostream>
 #include <memory>
 #include "Renderer.h"
-#include <glm/glm.hpp>
 
 int main() {
 
