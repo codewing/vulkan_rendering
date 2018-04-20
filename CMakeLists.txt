@@ -11,7 +11,7 @@ set(SOURCE_FILES
         src/QueueFamilyIndices.h
         src/SwapChainSupportDetails.h
         src/Utilities.cpp src/Utilities.h
-        src/Window.cpp src/Window.h)
+        src/Window.cpp src/Window.h src/vertex.h src/Scene.cpp src/Scene.h)
 add_executable(vulkan_voxel ${SOURCE_FILES})
 
 ##################################
