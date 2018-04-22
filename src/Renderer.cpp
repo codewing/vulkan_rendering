@@ -15,8 +15,9 @@
 #include "QueueFamilyIndices.h"
 #include "vertex.h"
 
-Renderer::Renderer(int width, int height) {
+Renderer::Renderer(std::shared_ptr<Scene> scene, int width, int height) {
     window = std::make_shared<Window>(this, width, height);
+    this->scene = scene;
     InitVulkan();
 }
 
@@ -36,12 +37,15 @@ void Renderer::InitVulkan() {
     CreateGraphicsPipeline();
     CreateFramebuffers();
     CreateCommandPool();
+    CreateVertexBuffer();
     CreateCommandBuffers();
     CreateSemaphores();
 }
 
 void Renderer::DeInitVulkan() {
     CleanupSwapchain();
+
+    DestroyVertexBuffer();
 
     DestroySemaphores();
     DestroyCommandPool();
@@ -664,6 +668,22 @@ void Renderer::CreateCommandPool() {
     ErrorCheck(vkCreateCommandPool(device, &poolInfo, nullptr, &commandPool));
 }
 
+void Renderer::CreateVertexBuffer() {
+    VkBufferCreateInfo bufferCreateInfo {};
+    bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferCreateInfo.size = sizeof(scene->getVertices()[0])* scene->getVertices().size();
+    bufferCreateInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+    bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE; //only used by graphics queue
+
+    ErrorCheck(vkCreateBuffer(device, &bufferCreateInfo, nullptr, &vertexBuffer));
+
+    VkMemoryRequirements memRequirements;
+    vkGetBufferMemoryRequirements(device, vertexBuffer, &memRequirements);
+}
+
+void Renderer::DestroyVertexBuffer(){
+    vkDestroyBuffer(device, vertexBuffer, nullptr);
+}
 
 void Renderer::CreateCommandBuffers() {
     commandBuffers.resize(swapchainFramebuffers.size());
@@ -883,5 +903,7 @@ VkShaderModule Renderer::CreateShaderModule(const std::vector<char>& code) {
 
     return shaderModule;
 }
+
+
 
 

@@ -9,6 +9,7 @@
 #include <vector>
 #include <memory>
 #include "SwapChainSupportDetails.h"
+#include "Scene.h"
 
 class Window;
 class QueueFamilyIndices;
@@ -18,6 +19,7 @@ class Renderer {
 private:
     // Variables
     std::shared_ptr<Window> window;
+    std::shared_ptr<Scene> scene;
 
     VkInstance instance = VK_NULL_HANDLE;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
@@ -37,6 +39,8 @@ private:
     VkRenderPass renderPass;
     VkPipelineLayout pipelineLayout;
     VkPipeline graphicsPipeline;
+
+    VkBuffer vertexBuffer;
 
     VkCommandPool commandPool;
     std::vector<VkCommandBuffer> commandBuffers;
@@ -79,6 +83,9 @@ private:
     void CreateFramebuffers();
     void DestroyFramebuffers();
 
+    void CreateVertexBuffer();
+    void DestroyVertexBuffer();
+
     void CreateCommandPool();
     void DestroyCommandPool();
     void CreateCommandBuffers();
@@ -109,7 +116,7 @@ private:
 
 public:
 
-    Renderer(int width, int height);
+    Renderer(std::shared_ptr<Scene> scene, int width, int height);
     ~Renderer();
 
     bool Run();
