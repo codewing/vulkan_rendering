@@ -3,15 +3,7 @@ project(vulkan_voxel)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(SOURCE_FILES
-        src/main.cpp
-        src/BUILD_OPTIONS.h
-        src/Renderer.cpp src/Renderer.h
-        src/QueueFamilyIndices.cpp
-        src/QueueFamilyIndices.h
-        src/SwapChainSupportDetails.h
-        src/Utilities.cpp src/Utilities.h
-        src/Window.cpp src/Window.h src/vertex.h src/Scene.cpp src/Scene.h)
+file(GLOB_RECURSE SOURCE_FILES src/*.cpp)
 add_executable(vulkan_voxel ${SOURCE_FILES})
 
 ##################################
