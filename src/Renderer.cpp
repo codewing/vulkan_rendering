@@ -15,6 +15,7 @@
 #include "QueueFamilyIndices.h"
 #include "vertex.h"
 #include "VulkanMemory.h"
+#include "VulkanDevice.h"
 
 Renderer::Renderer(std::shared_ptr<Scene> scene, int width, int height) {
     window = std::make_shared<Window>(this, width, height);
@@ -214,7 +215,7 @@ void Renderer::SetupPhysicalDevice() {
 }
 
 bool Renderer::IsDeviceSuitable(VkPhysicalDevice vkPhysicalDevice) {
-    QueueFamilyIndices indices = FindQueueFamilies(vkPhysicalDevice);
+    QueueFamilyIndices indices = VulkanDevice::FindQueueFamilies(vkPhysicalDevice, surface, QueueFamilyType::GRAPHICS_WITH_PRESENT_FAMILY);
 
     bool extensionsSupported = CheckDeviceExtensionSupport(vkPhysicalDevice);
 
@@ -225,43 +226,11 @@ bool Renderer::IsDeviceSuitable(VkPhysicalDevice vkPhysicalDevice) {
         swapChainSupported = !swapChainDetails.formats.empty() && !swapChainDetails.presentModes.empty();
     }
 
-    return indices.isComplete() && swapChainSupported;
-}
-
-QueueFamilyIndices Renderer::FindQueueFamilies(VkPhysicalDevice vkPhysicalDevice) {
-    QueueFamilyIndices indices;
-
-    uint32_t queueFamilyCount = 0;
-    vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &queueFamilyCount, nullptr);
-
-    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-    vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &queueFamilyCount, queueFamilies.data());
-
-    int queueIndex = 0;
-    for(const auto& queueFamily : queueFamilies) {
-        if (queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-            indices.SetGraphicsFamily(queueIndex);
-        }
-
-        VkBool32 presentSupport = false;
-        vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, queueIndex, surface, &presentSupport);
-
-        if (queueFamily.queueCount > 0 && presentSupport) {
-            indices.SetPresentFamily(queueIndex);
-        }
-
-        if (indices.isComplete()) {
-            break;
-        }
-
-        queueIndex++;
-    }
-
-    return indices;
+    return indices.isGraphicsWithPresentFamilySet() && swapChainSupported;
 }
 
 void Renderer::InitLogicalDevice() {
-    QueueFamilyIndices indices = FindQueueFamilies(physicalDevice);
+    QueueFamilyIndices indices = VulkanDevice::FindQueueFamilies(physicalDevice, surface, QueueFamilyType::GRAPHICS_WITH_PRESENT_FAMILY);
 
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfoVector;
     std::set<int> uniqueQueueFamilies = {indices.GetGraphicsFamily(), indices.GetPresentFamily()};
@@ -339,7 +308,8 @@ void Renderer::CreateSwapchain() {
     // render directly to image - VK_IMAGE_USAGE_TRANSFER_DST_BIT for post processing or other operations before rendering
     swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-    QueueFamilyIndices indices = FindQueueFamilies(physicalDevice);
+    QueueFamilyIndices indices = VulkanDevice::FindQueueFamilies(physicalDevice, surface, QueueFamilyType::GRAPHICS_WITH_PRESENT_FAMILY);
+
     uint32_t queueFamilyIndices[] = {(uint32_t) indices.GetGraphicsFamily(), (uint32_t) indices.GetPresentFamily()};
 
     if (indices.GetGraphicsFamily() != indices.GetPresentFamily()) {
@@ -659,7 +629,7 @@ void Renderer::DestroyFramebuffers() {
 }
 
 void Renderer::CreateCommandPool() {
-    QueueFamilyIndices queueFamilyIndices = FindQueueFamilies(physicalDevice);
+    QueueFamilyIndices queueFamilyIndices = VulkanDevice::FindQueueFamilies(physicalDevice, surface, QueueFamilyType::GRAPHICS_WITH_PRESENT_FAMILY);
 
     VkCommandPoolCreateInfo poolInfo {};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;

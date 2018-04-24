@@ -102,7 +102,6 @@ private:
     // Debug callbacks
     bool IsDeviceSuitable(VkPhysicalDevice vkPhysicalDevice);
     bool CheckDeviceExtensionSupport(VkPhysicalDevice vkPhysicalDevice);
-    QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice vkPhysicalDevice);
 
     SwapChainSupportDetails QuerySwapchainSupport(VkPhysicalDevice device);
     VkSurfaceFormatKHR ChooseSwapchainSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);

@@ -4,7 +4,7 @@
 
 #include "QueueFamilyIndices.h"
 
-bool QueueFamilyIndices::isComplete() {
+bool QueueFamilyIndices::isGraphicsWithPresentFamilySet() {
     return graphicsFamily >= 0 && presentFamily >= 0;
 }
 
@@ -22,4 +22,12 @@ int QueueFamilyIndices::GetPresentFamily() const {
 
 void QueueFamilyIndices::SetPresentFamily(int presentFamily) {
     this->presentFamily = presentFamily;
+}
+
+int QueueFamilyIndices::GetTransferFamily() const {
+    return transferFamily;
+}
+
+void QueueFamilyIndices::SetTransferFamily(int transferFamily) {
+    this->transferFamily = transferFamily;
 }
