@@ -41,6 +41,7 @@ private:
     VkPipeline graphicsPipeline;
 
     VkBuffer vertexBuffer;
+    VkDeviceMemory vertexBufferMemory;
 
     VkCommandPool commandPool;
     std::vector<VkCommandBuffer> commandBuffers;

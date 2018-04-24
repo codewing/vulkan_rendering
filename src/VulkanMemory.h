@@ -9,6 +9,8 @@
 #include <vulkan/vulkan.h>
 
 class VulkanMemory {
+
+public:
     static uint32_t FindMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties);
 };
 

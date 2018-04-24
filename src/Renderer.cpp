@@ -14,6 +14,7 @@
 #include "Window.h"
 #include "QueueFamilyIndices.h"
 #include "vertex.h"
+#include "VulkanMemory.h"
 
 Renderer::Renderer(std::shared_ptr<Scene> scene, int width, int height) {
     window = std::make_shared<Window>(this, width, height);
@@ -669,6 +670,7 @@ void Renderer::CreateCommandPool() {
 }
 
 void Renderer::CreateVertexBuffer() {
+    // create the buffer
     VkBufferCreateInfo bufferCreateInfo {};
     bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferCreateInfo.size = sizeof(scene->getVertices()[0])* scene->getVertices().size();
@@ -677,12 +679,35 @@ void Renderer::CreateVertexBuffer() {
 
     ErrorCheck(vkCreateBuffer(device, &bufferCreateInfo, nullptr, &vertexBuffer));
 
+    // check the memory requirements
     VkMemoryRequirements memRequirements;
     vkGetBufferMemoryRequirements(device, vertexBuffer, &memRequirements);
+
+    // allocate memory based on requirements
+    VkMemoryAllocateInfo memoryAllocateInfo {};
+    memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    memoryAllocateInfo.allocationSize = memRequirements.size;
+    memoryAllocateInfo.memoryTypeIndex = VulkanMemory::FindMemoryType(
+            physicalDevice,
+            memRequirements.memoryTypeBits,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+    );
+
+    ErrorCheck(vkAllocateMemory(device, &memoryAllocateInfo, nullptr, &vertexBufferMemory));
+
+    // bind the memory
+    vkBindBufferMemory(device, vertexBuffer, vertexBufferMemory, 0);
+
+    // map and copy the vertices
+    void* data;
+    vkMapMemory(device, vertexBufferMemory, 0, bufferCreateInfo.size, 0, &data);
+    memcpy(data, scene->getVertices().data(), static_cast<size_t>(bufferCreateInfo.size));
+    vkUnmapMemory(device, vertexBufferMemory);
 }
 
 void Renderer::DestroyVertexBuffer(){
     vkDestroyBuffer(device, vertexBuffer, nullptr);
+    vkFreeMemory(device, vertexBufferMemory, nullptr);
 }
 
 void Renderer::CreateCommandBuffers() {
@@ -719,7 +744,11 @@ void Renderer::CreateCommandBuffers() {
 
         vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
-        vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+        VkBuffer vertexBuffers[] = {vertexBuffer};
+        VkDeviceSize offsets[] = {0};
+        vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
+
+        vkCmdDraw(commandBuffers[i], static_cast<uint32_t>(scene->getVertices().size()), 1, 0, 0);
 
         vkCmdEndRenderPass(commandBuffers[i]);
 
