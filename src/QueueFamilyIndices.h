@@ -9,24 +9,24 @@
 class QueueFamilyIndices {
 
 public:
-    const int NOT_FOUND_OR_UNSET = -1;
+    const uint32_t NOT_FOUND_OR_UNSET = UINT32_MAX;
 
     bool isGraphicsWithPresentFamilySet();
 
 private:
-    int graphicsFamily = NOT_FOUND_OR_UNSET;
-    int presentFamily = NOT_FOUND_OR_UNSET;
-    int transferFamily = NOT_FOUND_OR_UNSET;
+    uint32_t graphicsFamily = NOT_FOUND_OR_UNSET;
+    uint32_t presentFamily = NOT_FOUND_OR_UNSET;
+    uint32_t transferFamily = NOT_FOUND_OR_UNSET;
 
 public:
-    int GetGraphicsFamily() const;
-    void SetGraphicsFamily(int graphicsFamily);
+    uint32_t GetGraphicsFamily() const;
+    void SetGraphicsFamily(uint32_t graphicsFamily);
 
-    int GetPresentFamily() const;
-    void SetPresentFamily(int presentFamily);
+    uint32_t GetPresentFamily() const;
+    void SetPresentFamily(uint32_t presentFamily);
 
-    int GetTransferFamily() const;
-    void SetTransferFamily(int transferFamily);
+    uint32_t GetTransferFamily() const;
+    void SetTransferFamily(uint32_t transferFamily);
 };
 
 

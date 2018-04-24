@@ -2,32 +2,33 @@
 // Created by codewing on 21/10/2017.
 //
 
+#include <stdint-gcc.h>
 #include "QueueFamilyIndices.h"
 
 bool QueueFamilyIndices::isGraphicsWithPresentFamilySet() {
-    return graphicsFamily >= 0 && presentFamily >= 0;
+    return graphicsFamily != UINT32_MAX && presentFamily != UINT32_MAX;
 }
 
-int QueueFamilyIndices::GetGraphicsFamily() const {
+uint32_t QueueFamilyIndices::GetGraphicsFamily() const {
     return graphicsFamily;
 }
 
-void QueueFamilyIndices::SetGraphicsFamily(int graphicsFamily) {
+void QueueFamilyIndices::SetGraphicsFamily(uint32_t graphicsFamily) {
     this->graphicsFamily = graphicsFamily;
 }
 
-int QueueFamilyIndices::GetPresentFamily() const {
+uint32_t QueueFamilyIndices::GetPresentFamily() const {
     return presentFamily;
 }
 
-void QueueFamilyIndices::SetPresentFamily(int presentFamily) {
+void QueueFamilyIndices::SetPresentFamily(uint32_t presentFamily) {
     this->presentFamily = presentFamily;
 }
 
-int QueueFamilyIndices::GetTransferFamily() const {
+uint32_t QueueFamilyIndices::GetTransferFamily() const {
     return transferFamily;
 }
 
-void QueueFamilyIndices::SetTransferFamily(int transferFamily) {
+void QueueFamilyIndices::SetTransferFamily(uint32_t transferFamily) {
     this->transferFamily = transferFamily;
 }

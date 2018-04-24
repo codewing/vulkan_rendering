@@ -230,14 +230,15 @@ bool Renderer::IsDeviceSuitable(VkPhysicalDevice vkPhysicalDevice) {
 }
 
 void Renderer::InitLogicalDevice() {
-    QueueFamilyIndices indices = VulkanDevice::FindQueueFamilies(physicalDevice, surface, QueueFamilyType::GRAPHICS_WITH_PRESENT_FAMILY);
+    QueueFamilyIndices graphicsFamilyIndices = VulkanDevice::FindQueueFamilies(physicalDevice, surface, QueueFamilyType::GRAPHICS_WITH_PRESENT_FAMILY);
+    QueueFamilyIndices transferFamilyIndices = VulkanDevice::FindQueueFamilies(physicalDevice, surface, QueueFamilyType::TRANSFER_FAMILY);
 
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfoVector;
-    std::set<int> uniqueQueueFamilies = {indices.GetGraphicsFamily(), indices.GetPresentFamily()};
+    std::set<uint32_t> uniqueQueueFamilies = {graphicsFamilyIndices.GetGraphicsFamily(), graphicsFamilyIndices.GetPresentFamily(), transferFamilyIndices.GetTransferFamily()};
 
     float queuePriority = 1.0f;
 
-    for (int queueFamily : uniqueQueueFamilies) {
+    for (uint32_t queueFamily : uniqueQueueFamilies) {
         VkDeviceQueueCreateInfo queueCreateInfo = {};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
         queueCreateInfo.queueFamilyIndex = queueFamily;
@@ -245,6 +246,7 @@ void Renderer::InitLogicalDevice() {
         queueCreateInfo.pQueuePriorities = &queuePriority;
         queueCreateInfoVector.push_back(queueCreateInfo);
     }
+
 
     VkPhysicalDeviceFeatures deviceFeatures {};
 
@@ -266,8 +268,9 @@ void Renderer::InitLogicalDevice() {
 
     ErrorCheck(vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &device));
 
-    vkGetDeviceQueue(device, indices.GetGraphicsFamily(), 0, &graphicsQueue);
-    vkGetDeviceQueue(device, indices.GetPresentFamily(), 0, &presentQueue);
+    vkGetDeviceQueue(device, graphicsFamilyIndices.GetGraphicsFamily(), 0, &graphicsQueue);
+    vkGetDeviceQueue(device, graphicsFamilyIndices.GetPresentFamily(), 0, &presentQueue);
+    vkGetDeviceQueue(device, transferFamilyIndices.GetTransferFamily(), 0, &transferQueue);
 }
 
 void Renderer::DeInitLogicalDevice() {

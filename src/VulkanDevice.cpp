@@ -15,7 +15,7 @@ QueueFamilyIndices VulkanDevice::FindQueueFamilies(VkPhysicalDevice vkPhysicalDe
     std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
     vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &queueFamilyCount, queueFamilies.data());
 
-    int queueIndex = 0;
+    uint32_t queueIndex = 0;
     for(const auto& queueFamily : queueFamilies) {
         if(queueFamily.queueCount <= 0){
             continue;
