@@ -3,7 +3,7 @@ project(vulkan_voxel)
 
 set(CMAKE_CXX_STANDARD 17)
 
-file(GLOB_RECURSE SOURCE_FILES "*.cpp" "*.h")
+file(GLOB_RECURSE SOURCE_FILES "src/*.cpp" "src/*.h")
 add_executable(vulkan_voxel ${SOURCE_FILES})
 
 ##################################

@@ -16,6 +16,7 @@
 #include "vertex.h"
 #include "VulkanMemory.h"
 #include "VulkanDevice.h"
+#include "VulkanCommand.h"
 
 Renderer::Renderer(std::shared_ptr<Scene> scene, int width, int height) {
     window = std::make_shared<Window>(this, width, height);
@@ -38,7 +39,7 @@ void Renderer::InitVulkan() {
     CreateRenderPass();
     CreateGraphicsPipeline();
     CreateFramebuffers();
-    CreateCommandPool();
+    CreateCommandPools();
     CreateVertexBuffer();
     CreateCommandBuffers();
     CreateSemaphores();
@@ -50,7 +51,7 @@ void Renderer::DeInitVulkan() {
     DestroyVertexBuffer();
 
     DestroySemaphores();
-    DestroyCommandPool();
+    DestroyCommandPools();
 
     DeInitLogicalDevice();
     DestroyDebugReportCallbackEXT(instance, callback, nullptr);
@@ -311,19 +312,18 @@ void Renderer::CreateSwapchain() {
     // render directly to image - VK_IMAGE_USAGE_TRANSFER_DST_BIT for post processing or other operations before rendering
     swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-    QueueFamilyIndices indices = VulkanDevice::FindQueueFamilies(physicalDevice, surface, QueueFamilyType::GRAPHICS_WITH_PRESENT_FAMILY);
+    QueueFamilyIndices indicesGraphics = VulkanDevice::FindQueueFamilies(physicalDevice, surface, QueueFamilyType::GRAPHICS_WITH_PRESENT_FAMILY);
+    QueueFamilyIndices indicesTransfer = VulkanDevice::FindQueueFamilies(physicalDevice, surface, QueueFamilyType::TRANSFER_FAMILY);
 
-    uint32_t queueFamilyIndices[] = {(uint32_t) indices.GetGraphicsFamily(), (uint32_t) indices.GetPresentFamily()};
+    std::vector<uint32_t> queueFamilyIndices = {indicesGraphics.GetGraphicsFamily(), indicesTransfer.GetTransferFamily()};
 
-    if (indices.GetGraphicsFamily() != indices.GetPresentFamily()) {
-        swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-        swapchainCreateInfo.queueFamilyIndexCount = 2;
-        swapchainCreateInfo.pQueueFamilyIndices = queueFamilyIndices;
-    } else {
-        swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-        swapchainCreateInfo.queueFamilyIndexCount = 0; // Optional
-        swapchainCreateInfo.pQueueFamilyIndices = nullptr; // Optional
+    if (indicesGraphics.GetGraphicsFamily() != indicesGraphics.GetPresentFamily()) {
+        queueFamilyIndices.push_back(indicesGraphics.GetPresentFamily());
     }
+
+    swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+    swapchainCreateInfo.queueFamilyIndexCount = queueFamilyIndices.size();
+    swapchainCreateInfo.pQueueFamilyIndices = queueFamilyIndices.data();
 
     swapchainCreateInfo.preTransform = swapchainDetails.capabilities.currentTransform;
     swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR; // Don't blend with other windows
@@ -363,7 +363,7 @@ void Renderer::RecreateSwapchain() {
 
 void Renderer::CleanupSwapchain() {
     DestroyFramebuffers();
-    vkFreeCommandBuffers(device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+    vkFreeCommandBuffers(device, graphicCommandPool, static_cast<uint32_t>(graphicCommandBuffers.size()), graphicCommandBuffers.data());
     DestroyGraphicsPipeline();
     DestroyRenderPass();
     DestroyImageViews();
@@ -631,15 +631,9 @@ void Renderer::DestroyFramebuffers() {
     }
 }
 
-void Renderer::CreateCommandPool() {
-    QueueFamilyIndices queueFamilyIndices = VulkanDevice::FindQueueFamilies(physicalDevice, surface, QueueFamilyType::GRAPHICS_WITH_PRESENT_FAMILY);
-
-    VkCommandPoolCreateInfo poolInfo {};
-    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    poolInfo.queueFamilyIndex = static_cast<uint32_t>(queueFamilyIndices.GetGraphicsFamily());
-    poolInfo.flags = 0; // Optional
-
-    ErrorCheck(vkCreateCommandPool(device, &poolInfo, nullptr, &commandPool));
+void Renderer::CreateCommandPools() {
+    VulkanCommand::CreateCommandPool(device, physicalDevice, surface, QueueFamilyType::GRAPHICS_WITH_PRESENT_FAMILY, &graphicCommandPool);
+    VulkanCommand::CreateCommandPool(device, physicalDevice, surface, QueueFamilyType::TRANSFER_FAMILY, &transferCommandPool);
 }
 
 void Renderer::CreateVertexBuffer() {
@@ -660,23 +654,23 @@ void Renderer::DestroyVertexBuffer(){
 }
 
 void Renderer::CreateCommandBuffers() {
-    commandBuffers.resize(swapchainFramebuffers.size());
+    graphicCommandBuffers.resize(swapchainFramebuffers.size());
 
     VkCommandBufferAllocateInfo commandBufferAllocInfo {};
     commandBufferAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    commandBufferAllocInfo.commandPool = commandPool;
+    commandBufferAllocInfo.commandPool = graphicCommandPool;
     commandBufferAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    commandBufferAllocInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
+    commandBufferAllocInfo.commandBufferCount = static_cast<uint32_t>(graphicCommandBuffers.size());
 
-    ErrorCheck(vkAllocateCommandBuffers(device, &commandBufferAllocInfo, commandBuffers.data()));
+    ErrorCheck(vkAllocateCommandBuffers(device, &commandBufferAllocInfo, graphicCommandBuffers.data()));
 
-    for (size_t i = 0; i < commandBuffers.size(); i++) {
+    for (size_t i = 0; i < graphicCommandBuffers.size(); i++) {
         VkCommandBufferBeginInfo beginInfo {};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
         beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
         beginInfo.pInheritanceInfo = nullptr; // Optional
 
-        vkBeginCommandBuffer(commandBuffers[i], &beginInfo);
+        vkBeginCommandBuffer(graphicCommandBuffers[i], &beginInfo);
 
         VkRenderPassBeginInfo renderPassInfo {};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -689,24 +683,25 @@ void Renderer::CreateCommandBuffers() {
         renderPassInfo.clearValueCount = 1;
         renderPassInfo.pClearValues = &clearColor;
 
-        vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+        vkCmdBeginRenderPass(graphicCommandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-        vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+        vkCmdBindPipeline(graphicCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
         VkBuffer vertexBuffers[] = {vertexBuffer};
         VkDeviceSize offsets[] = {0};
-        vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
+        vkCmdBindVertexBuffers(graphicCommandBuffers[i], 0, 1, vertexBuffers, offsets);
 
-        vkCmdDraw(commandBuffers[i], static_cast<uint32_t>(scene->getVertices().size()), 1, 0, 0);
+        vkCmdDraw(graphicCommandBuffers[i], static_cast<uint32_t>(scene->getVertices().size()), 1, 0, 0);
 
-        vkCmdEndRenderPass(commandBuffers[i]);
+        vkCmdEndRenderPass(graphicCommandBuffers[i]);
 
-        ErrorCheck(vkEndCommandBuffer(commandBuffers[i]));
+        ErrorCheck(vkEndCommandBuffer(graphicCommandBuffers[i]));
     }
 }
 
-void Renderer::DestroyCommandPool() {
-    vkDestroyCommandPool(device, commandPool, nullptr);
+void Renderer::DestroyCommandPools() {
+    vkDestroyCommandPool(device, graphicCommandPool, nullptr);
+    vkDestroyCommandPool(device, transferCommandPool, nullptr);
 }
 
 void Renderer::DrawFrame() {
@@ -729,7 +724,7 @@ void Renderer::DrawFrame() {
     submitInfo.pWaitSemaphores = waitSemaphores;
     submitInfo.pWaitDstStageMask = waitStages;
     submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &commandBuffers[imageIndex];
+    submitInfo.pCommandBuffers = &graphicCommandBuffers[imageIndex];
 
     VkSemaphore signalSemaphores[] = {renderFinishedSemaphore};
     submitInfo.signalSemaphoreCount = 1;

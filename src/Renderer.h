@@ -44,8 +44,9 @@ private:
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
 
-    VkCommandPool commandPool;
-    std::vector<VkCommandBuffer> commandBuffers;
+    VkCommandPool graphicCommandPool;
+    VkCommandPool transferCommandPool;
+    std::vector<VkCommandBuffer> graphicCommandBuffers;
 
     VkSemaphore imageAvailableSemaphore;
     VkSemaphore renderFinishedSemaphore;
@@ -88,8 +89,8 @@ private:
     void CreateVertexBuffer();
     void DestroyVertexBuffer();
 
-    void CreateCommandPool();
-    void DestroyCommandPool();
+    void CreateCommandPools();
+    void DestroyCommandPools();
     void CreateCommandBuffers();
 
     void DrawFrame();
