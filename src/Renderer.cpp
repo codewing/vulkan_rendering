@@ -643,38 +643,14 @@ void Renderer::CreateCommandPool() {
 }
 
 void Renderer::CreateVertexBuffer() {
-    // create the buffer
-    VkBufferCreateInfo bufferCreateInfo {};
-    bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    bufferCreateInfo.size = sizeof(scene->getVertices()[0])* scene->getVertices().size();
-    bufferCreateInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-    bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE; //only used by graphics queue
-
-    ErrorCheck(vkCreateBuffer(device, &bufferCreateInfo, nullptr, &vertexBuffer));
-
-    // check the memory requirements
-    VkMemoryRequirements memRequirements;
-    vkGetBufferMemoryRequirements(device, vertexBuffer, &memRequirements);
-
-    // allocate memory based on requirements
-    VkMemoryAllocateInfo memoryAllocateInfo {};
-    memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    memoryAllocateInfo.allocationSize = memRequirements.size;
-    memoryAllocateInfo.memoryTypeIndex = VulkanMemory::FindMemoryType(
-            physicalDevice,
-            memRequirements.memoryTypeBits,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-    );
-
-    ErrorCheck(vkAllocateMemory(device, &memoryAllocateInfo, nullptr, &vertexBufferMemory));
-
-    // bind the memory
-    vkBindBufferMemory(device, vertexBuffer, vertexBufferMemory, 0);
+    VkDeviceSize size = sizeof(scene->getVertices()[0]) * scene->getVertices().size();
+    VkMemoryPropertyFlags memoryPropertyFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+    VulkanMemory::CreateBufferAndMapMemory(device, physicalDevice, size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, memoryPropertyFlags, vertexBuffer, vertexBufferMemory);
 
     // map and copy the vertices
     void* data;
-    vkMapMemory(device, vertexBufferMemory, 0, bufferCreateInfo.size, 0, &data);
-    memcpy(data, scene->getVertices().data(), static_cast<size_t>(bufferCreateInfo.size));
+    vkMapMemory(device, vertexBufferMemory, 0, size, 0, &data);
+    memcpy(data, scene->getVertices().data(), static_cast<size_t>(size));
     vkUnmapMemory(device, vertexBufferMemory);
 }
 
