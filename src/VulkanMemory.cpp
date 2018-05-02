@@ -20,9 +20,10 @@ uint32_t VulkanMemory::FindMemoryType(VkPhysicalDevice physicalDevice, uint32_t 
     throw std::runtime_error("failed to find suitable memory type!");
 }
 
-void VulkanMemory::CreateBufferAndMapMemory(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize size, VkBufferUsageFlags usageFlags,
-                                            VkMemoryPropertyFlags memoryPropertyFlags, VkBuffer &buffer,
-                                            VkDeviceMemory &bufferMemory) {
+void VulkanMemory::CreateBufferAndBindMemory(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize size,
+                                             VkBufferUsageFlags usageFlags,
+                                             VkMemoryPropertyFlags memoryPropertyFlags, VkBuffer &buffer,
+                                             VkDeviceMemory &bufferMemory) {
     // create the buffer
     VkBufferCreateInfo bufferCreateInfo {};
     bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;

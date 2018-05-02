@@ -637,15 +637,31 @@ void Renderer::CreateCommandPools() {
 }
 
 void Renderer::CreateVertexBuffer() {
-    VkDeviceSize size = sizeof(scene->getVertices()[0]) * scene->getVertices().size();
-    VkMemoryPropertyFlags memoryPropertyFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-    VulkanMemory::CreateBufferAndMapMemory(device, physicalDevice, size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, memoryPropertyFlags, vertexBuffer, vertexBufferMemory);
+    VkDeviceSize bufferSize = sizeof(scene->getVertices()[0]) * scene->getVertices().size();
 
-    // map and copy the vertices
-    void* data;
-    vkMapMemory(device, vertexBufferMemory, 0, size, 0, &data);
-    memcpy(data, scene->getVertices().data(), static_cast<size_t>(size));
-    vkUnmapMemory(device, vertexBufferMemory);
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
+    VulkanMemory::CreateBufferAndBindMemory(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                            stagingBuffer, stagingBufferMemory);
+
+    // map and copy the vertices to slow ram
+    void *data;
+    vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
+    memcpy(data, scene->getVertices().data(), static_cast<size_t>(bufferSize));
+    vkUnmapMemory(device, stagingBufferMemory);
+
+    VulkanMemory::CreateBufferAndBindMemory(device, physicalDevice, bufferSize,
+                                            VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                                            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
+
+    // copy vertices from slow ram to fast ram
+    VkCommandBuffer copyCommand = VulkanCommand::CreateCopyBufferCommand(device, transferCommandPool, stagingBuffer, vertexBuffer, bufferSize);
+    VulkanCommand::SyncExecuteSingleCommand(device, transferCommandPool, transferQueue, copyCommand);
+
+    // cleanup
+    vkDestroyBuffer(device, stagingBuffer, nullptr);
+    vkFreeMemory(device, stagingBufferMemory, nullptr);
 }
 
 void Renderer::DestroyVertexBuffer(){
@@ -672,7 +688,7 @@ void Renderer::CreateCommandBuffers() {
 
         vkBeginCommandBuffer(graphicCommandBuffers[i], &beginInfo);
 
-        VkRenderPassBeginInfo renderPassInfo {};
+        VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         renderPassInfo.renderPass = renderPass;
         renderPassInfo.framebuffer = swapchainFramebuffers[i];

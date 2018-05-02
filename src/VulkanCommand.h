@@ -12,6 +12,13 @@ class VulkanCommand {
 
 public:
     static void CreateCommandPool(VkDevice device, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, QueueFamilyType queueFamilyType, VkCommandPool* commandPool);
+
+    static void SyncExecuteSingleCommand(VkDevice device, VkCommandPool pool, VkQueue queue,
+                                         VkCommandBuffer commandBuffer);
+
+    static VkCommandBuffer CreateCopyBufferCommand(VkDevice device, VkCommandPool commandPool, VkBuffer srcBuffer,
+                                        VkBuffer dstBuffer, VkDeviceSize size);
+
 };
 
 
