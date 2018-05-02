@@ -6,7 +6,8 @@
 #include <stdexcept>
 #include "VulkanDevice.h"
 
-QueueFamilyIndices VulkanDevice::FindQueueFamilies(VkPhysicalDevice vkPhysicalDevice, VkSurfaceKHR surface, QueueFamilyType type) {
+QueueFamilyIndices
+VulkanDevice::FindQueueFamilies(VkPhysicalDevice vkPhysicalDevice, VkSurfaceKHR surface, QueueFamilyType type) {
     QueueFamilyIndices indices;
 
     uint32_t queueFamilyCount = 0;
@@ -16,12 +17,12 @@ QueueFamilyIndices VulkanDevice::FindQueueFamilies(VkPhysicalDevice vkPhysicalDe
     vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &queueFamilyCount, queueFamilies.data());
 
     uint32_t queueIndex = 0;
-    for(const auto& queueFamily : queueFamilies) {
-        if(queueFamily.queueCount <= 0){
+    for (const auto &queueFamily : queueFamilies) {
+        if (queueFamily.queueCount <= 0) {
             continue;
         }
 
-        if(QueueFamilyType::GRAPHICS_WITH_PRESENT_FAMILY == type){
+        if (QueueFamilyType::GRAPHICS_WITH_PRESENT_FAMILY == type) {
             if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
                 indices.SetGraphicsFamily(queueIndex);
             }
@@ -36,7 +37,7 @@ QueueFamilyIndices VulkanDevice::FindQueueFamilies(VkPhysicalDevice vkPhysicalDe
             if (indices.isGraphicsWithPresentFamilySet()) {
                 break;
             }
-        } else if(QueueFamilyType::TRANSFER_FAMILY == type) {
+        } else if (QueueFamilyType::TRANSFER_FAMILY == type) {
             if ((queueFamily.queueFlags & VK_QUEUE_TRANSFER_BIT) && !(queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)) {
                 indices.SetTransferFamily(queueIndex);
                 break;

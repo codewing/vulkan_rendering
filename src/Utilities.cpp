@@ -9,11 +9,9 @@
 
 #if BUILD_ENABLE_VULKAN_DEBUG
 
-void ErrorCheck(VkResult result)
-{
+void ErrorCheck(VkResult result) {
     if (result < 0) {
-        switch (result)
-        {
+        switch (result) {
             case VK_ERROR_OUT_OF_HOST_MEMORY:
                 std::cout << "VK_ERROR_OUT_OF_HOST_MEMORY" << std::endl;
                 break;
@@ -80,8 +78,9 @@ void ErrorCheck(VkResult result)
         static_assert("Vulkan runtime error.");
     }
 }
+
 #else
-    void ErrorCheck(VkResult result){}
+void ErrorCheck(VkResult result){}
 #endif //BUILD_ENABLE_VULKAN_DEBUG
 
 std::vector<char> readFile(const std::string &filename) {

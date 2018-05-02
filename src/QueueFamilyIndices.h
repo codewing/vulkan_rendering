@@ -20,12 +20,15 @@ private:
 
 public:
     uint32_t GetGraphicsFamily() const;
+
     void SetGraphicsFamily(uint32_t graphicsFamily);
 
     uint32_t GetPresentFamily() const;
+
     void SetPresentFamily(uint32_t presentFamily);
 
     uint32_t GetTransferFamily() const;
+
     void SetTransferFamily(uint32_t transferFamily);
 };
 

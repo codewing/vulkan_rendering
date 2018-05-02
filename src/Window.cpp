@@ -5,9 +5,10 @@
 #include "Window.h"
 
 #define GLFW_INCLUDE_VULKAN
+
 #include <GLFW/glfw3.h>
 
-Window::Window(Renderer* renderer, int width, int height) : WINDOW_WIDTH(width), WINDOW_HEIGHT(height) {
+Window::Window(Renderer *renderer, int width, int height) : WINDOW_WIDTH(width), WINDOW_HEIGHT(height) {
     running = true;
     this->renderer = renderer;
 
@@ -37,8 +38,8 @@ bool Window::Update() {
     return running;
 }
 
-void Window::FramebufferResizedCB(GLFWwindow* window, int width, int height) {
-    Window* currentWindow = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+void Window::FramebufferResizedCB(GLFWwindow *window, int width, int height) {
+    Window *currentWindow = reinterpret_cast<Window *>(glfwGetWindowUserPointer(window));
     currentWindow->renderer->RecreateSwapchain();
 }
 
@@ -48,7 +49,7 @@ void Window::CleanUp() {
     glfwTerminate();
 }
 
-GLFWwindow* Window::GetGLFWwindow() {
+GLFWwindow *Window::GetGLFWwindow() {
     return window;
 }
 

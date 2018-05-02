@@ -12,6 +12,7 @@
 #include "Scene.h"
 
 class Window;
+
 class QueueFamilyIndices;
 
 class Renderer {
@@ -53,75 +54,107 @@ private:
 
     VkDebugReportCallbackEXT callback = VK_NULL_HANDLE;
 
-    const std::vector<const char*> validationLayers = {"VK_LAYER_LUNARG_standard_validation"};
-    const std::vector<const char*> deviceExtensions  = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+    const std::vector<const char *> validationLayers = {"VK_LAYER_LUNARG_standard_validation"};
+    const std::vector<const char *> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
     // Methods
     void InitVulkan();
+
     void DeInitVulkan();
 
     void CreateInstance();
+
     void DestroyInstance();
 
     void CreateSurface();
+
     void DestroySurface();
 
     void SetupPhysicalDevice();
 
     void InitLogicalDevice();
+
     void DeInitLogicalDevice();
 
     void CreateSwapchain();
+
     void DestroySwapchain();
+
     void CleanupSwapchain();
+
     void GetSwapchainImages();
+
     void CreateImageViews();
+
     void DestroyImageViews();
 
     void CreateRenderPass();
+
     void DestroyRenderPass();
+
     void CreateGraphicsPipeline();
+
     void DestroyGraphicsPipeline();
 
     void CreateFramebuffers();
+
     void DestroyFramebuffers();
 
     void CreateVertexBuffer();
+
     void DestroyVertexBuffer();
 
     void CreateCommandPools();
+
     void DestroyCommandPools();
+
     void CreateCommandBuffers();
 
     void DrawFrame();
 
     void CreateSemaphores();
+
     void DestroySemaphores();
 
     bool CheckAllValidationLayersSupported();
-    std::vector<const char*> GetRequiredExtensions();
+
+    std::vector<const char *> GetRequiredExtensions();
 
     // Debug callbacks
     bool IsDeviceSuitable(VkPhysicalDevice vkPhysicalDevice);
+
     bool CheckDeviceExtensionSupport(VkPhysicalDevice vkPhysicalDevice);
 
     SwapChainSupportDetails QuerySwapchainSupport(VkPhysicalDevice device);
+
     VkSurfaceFormatKHR ChooseSwapchainSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
+
     VkPresentModeKHR ChooseSwapchainPresentMode(const std::vector<VkPresentModeKHR> availablePresentModes);
+
     VkExtent2D ChooseSwapchainExtent(const VkSurfaceCapabilitiesKHR &capabilities);
 
     void SetupDebugCallbacks();
-    static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objType, uint64_t obj, size_t location, int32_t code, const char* layerPrefix, const char* msg, void* userData);
-    VkResult CreateDebugReportCallbackEXT(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugReportCallbackEXT* pCallback);
-    void DestroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT callback, const VkAllocationCallbacks* pAllocator);
-    VkShaderModule CreateShaderModule(const std::vector<char>& code);
+
+    static VKAPI_ATTR VkBool32 VKAPI_CALL
+    debugCallback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objType, uint64_t obj, size_t location,
+                  int32_t code, const char *layerPrefix, const char *msg, void *userData);
+
+    VkResult CreateDebugReportCallbackEXT(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT *pCreateInfo,
+                                          const VkAllocationCallbacks *pAllocator, VkDebugReportCallbackEXT *pCallback);
+
+    void DestroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT callback,
+                                       const VkAllocationCallbacks *pAllocator);
+
+    VkShaderModule CreateShaderModule(const std::vector<char> &code);
 
 public:
 
     Renderer(std::shared_ptr<Scene> scene, int width, int height);
+
     ~Renderer();
 
     bool Run();
+
     void RecreateSwapchain();
 
 };

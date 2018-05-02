@@ -12,8 +12,8 @@ class GLFWwindow;
 class Window {
 
 private:
-    GLFWwindow* window = nullptr;
-    Renderer* renderer = nullptr;
+    GLFWwindow *window = nullptr;
+    Renderer *renderer = nullptr;
 
     const int WINDOW_WIDTH;
     const int WINDOW_HEIGHT;
@@ -21,16 +21,19 @@ private:
     bool running;
 
     void InitWindow();
+
     void CleanUp();
 
-    static void FramebufferResizedCB(GLFWwindow* window, int width, int height);
+    static void FramebufferResizedCB(GLFWwindow *window, int width, int height);
 
 public:
-    Window(Renderer* renderer, int width, int height);
+    Window(Renderer *renderer, int width, int height);
+
     ~Window();
 
     bool Update();
-    GLFWwindow* GetGLFWwindow();
+
+    GLFWwindow *GetGLFWwindow();
 
     const int GetWidth() const;
 

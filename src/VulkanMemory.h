@@ -15,7 +15,9 @@ public:
                                           VkBufferUsageFlags usageFlags,
                                           VkMemoryPropertyFlags memoryPropertyFlags, VkBuffer &buffer,
                                           VkDeviceMemory &bufferMemory);
-    static uint32_t FindMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties);
+
+    static uint32_t
+    FindMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 };
 

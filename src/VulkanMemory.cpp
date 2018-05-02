@@ -6,7 +6,8 @@
 #include "VulkanMemory.h"
 #include "Utilities.h"
 
-uint32_t VulkanMemory::FindMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties) {
+uint32_t
+VulkanMemory::FindMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties) {
 
     VkPhysicalDeviceMemoryProperties memProperties;
     vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
@@ -25,7 +26,7 @@ void VulkanMemory::CreateBufferAndBindMemory(VkDevice device, VkPhysicalDevice p
                                              VkMemoryPropertyFlags memoryPropertyFlags, VkBuffer &buffer,
                                              VkDeviceMemory &bufferMemory) {
     // create the buffer
-    VkBufferCreateInfo bufferCreateInfo {};
+    VkBufferCreateInfo bufferCreateInfo{};
     bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferCreateInfo.size = size;
     bufferCreateInfo.usage = usageFlags;
@@ -38,7 +39,7 @@ void VulkanMemory::CreateBufferAndBindMemory(VkDevice device, VkPhysicalDevice p
     vkGetBufferMemoryRequirements(device, buffer, &memRequirements);
 
     // allocate memory based on requirements
-    VkMemoryAllocateInfo memoryAllocateInfo {};
+    VkMemoryAllocateInfo memoryAllocateInfo{};
     memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     memoryAllocateInfo.allocationSize = memRequirements.size;
     memoryAllocateInfo.memoryTypeIndex = VulkanMemory::FindMemoryType(

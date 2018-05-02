@@ -17,7 +17,8 @@ enum QueueFamilyType {
 class VulkanDevice {
 
 public:
-    static QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice vkPhysicalDevice, VkSurfaceKHR surface, QueueFamilyType type);
+    static QueueFamilyIndices
+    FindQueueFamilies(VkPhysicalDevice vkPhysicalDevice, VkSurfaceKHR surface, QueueFamilyType type);
 
 };
 

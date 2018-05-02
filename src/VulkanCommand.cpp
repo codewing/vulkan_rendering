@@ -5,21 +5,24 @@
 #include "VulkanCommand.h"
 #include "Utilities.h"
 
-void VulkanCommand::CreateCommandPool(VkDevice device, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, QueueFamilyType queueFamilyType, VkCommandPool* commandPool){
+void VulkanCommand::CreateCommandPool(VkDevice device, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
+                                      QueueFamilyType queueFamilyType, VkCommandPool *commandPool) {
     QueueFamilyIndices indices = VulkanDevice::FindQueueFamilies(physicalDevice, surface, queueFamilyType);
     uint32_t queueFamilyIndex;
 
     switch (queueFamilyType) {
-        case QueueFamilyType::GRAPHICS_WITH_PRESENT_FAMILY:{
+        case QueueFamilyType::GRAPHICS_WITH_PRESENT_FAMILY: {
             queueFamilyIndex = indices.GetGraphicsFamily();
-        }break;
+        }
+            break;
 
-        case QueueFamilyType::TRANSFER_FAMILY:{
+        case QueueFamilyType::TRANSFER_FAMILY: {
             queueFamilyIndex = indices.GetTransferFamily();
-        }break;
+        }
+            break;
     }
 
-    VkCommandPoolCreateInfo poolInfo {};
+    VkCommandPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     poolInfo.queueFamilyIndex = queueFamilyIndex;
     poolInfo.flags = 0; // Optional
@@ -28,9 +31,9 @@ void VulkanCommand::CreateCommandPool(VkDevice device, VkPhysicalDevice physical
 }
 
 VkCommandBuffer VulkanCommand::CreateCopyBufferCommand(VkDevice device, VkCommandPool commandPool, VkBuffer srcBuffer,
-                                            VkBuffer dstBuffer, VkDeviceSize size) {
+                                                       VkBuffer dstBuffer, VkDeviceSize size) {
     // Create command buffer for copying
-    VkCommandBufferAllocateInfo allocInfo {};
+    VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandPool = commandPool;
@@ -40,13 +43,13 @@ VkCommandBuffer VulkanCommand::CreateCopyBufferCommand(VkDevice device, VkComman
     vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer);
 
     // Start command buffer
-    VkCommandBufferBeginInfo beginInfo {};
+    VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
     vkBeginCommandBuffer(commandBuffer, &beginInfo);
 
     // Create the copy command
-    VkBufferCopy copyRegion {};
+    VkBufferCopy copyRegion{};
     copyRegion.srcOffset = 0;
     copyRegion.dstOffset = 0;
     copyRegion.size = size;
@@ -60,7 +63,7 @@ VkCommandBuffer VulkanCommand::CreateCopyBufferCommand(VkDevice device, VkComman
 
 void VulkanCommand::SyncExecuteSingleCommand(VkDevice device, VkCommandPool pool, VkQueue queue,
                                              VkCommandBuffer commandBuffer) {
-    VkSubmitInfo submitInfo {};
+    VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &commandBuffer;

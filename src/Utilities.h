@@ -14,4 +14,4 @@ void ErrorCheck(VkResult result);
 
 #endif //VULKAN_VOXEL_UTILITIES_H
 
-std::vector<char> readFile(const std::string& filename);
+std::vector<char> readFile(const std::string &filename);
