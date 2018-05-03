@@ -44,6 +44,8 @@ private:
 
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
+    VkBuffer indexBuffer;
+    VkDeviceMemory indexBufferMemory;
 
     VkCommandPool graphicCommandPool;
     VkCommandPool transferCommandPool;
@@ -59,53 +61,44 @@ private:
 
     // Methods
     void InitVulkan();
-
     void DeInitVulkan();
 
     void CreateInstance();
-
     void DestroyInstance();
 
     void CreateSurface();
-
     void DestroySurface();
 
     void SetupPhysicalDevice();
 
     void InitLogicalDevice();
-
     void DeInitLogicalDevice();
 
     void CreateSwapchain();
-
     void DestroySwapchain();
-
     void CleanupSwapchain();
 
     void GetSwapchainImages();
 
     void CreateImageViews();
-
     void DestroyImageViews();
 
     void CreateRenderPass();
-
     void DestroyRenderPass();
 
     void CreateGraphicsPipeline();
-
     void DestroyGraphicsPipeline();
 
     void CreateFramebuffers();
-
     void DestroyFramebuffers();
 
     void CreateVertexBuffer();
-
     void DestroyVertexBuffer();
 
-    void CreateCommandPools();
+    void CreateIndexBuffer();
+    void DestroyIndexBuffer();
 
+    void CreateCommandPools();
     void DestroyCommandPools();
 
     void CreateCommandBuffers();
@@ -113,35 +106,24 @@ private:
     void DrawFrame();
 
     void CreateSemaphores();
-
     void DestroySemaphores();
 
     bool CheckAllValidationLayersSupported();
 
     std::vector<const char *> GetRequiredExtensions();
-
-    // Debug callbacks
     bool IsDeviceSuitable(VkPhysicalDevice vkPhysicalDevice);
-
     bool CheckDeviceExtensionSupport(VkPhysicalDevice vkPhysicalDevice);
-
     SwapChainSupportDetails QuerySwapchainSupport(VkPhysicalDevice device);
-
     VkSurfaceFormatKHR ChooseSwapchainSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
-
     VkPresentModeKHR ChooseSwapchainPresentMode(const std::vector<VkPresentModeKHR> availablePresentModes);
-
     VkExtent2D ChooseSwapchainExtent(const VkSurfaceCapabilitiesKHR &capabilities);
 
     void SetupDebugCallbacks();
-
     static VKAPI_ATTR VkBool32 VKAPI_CALL
     debugCallback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objType, uint64_t obj, size_t location,
                   int32_t code, const char *layerPrefix, const char *msg, void *userData);
-
     VkResult CreateDebugReportCallbackEXT(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT *pCreateInfo,
                                           const VkAllocationCallbacks *pAllocator, VkDebugReportCallbackEXT *pCallback);
-
     void DestroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT callback,
                                        const VkAllocationCallbacks *pAllocator);
 
@@ -150,7 +132,6 @@ private:
 public:
 
     Renderer(std::shared_ptr<Scene> scene, int width, int height);
-
     ~Renderer();
 
     bool Run();

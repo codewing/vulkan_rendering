@@ -43,6 +43,7 @@ void Renderer::InitVulkan() {
     CreateFramebuffers();
     CreateCommandPools();
     CreateVertexBuffer();
+    CreateIndexBuffer();
     CreateCommandBuffers();
     CreateSemaphores();
 }
@@ -50,6 +51,7 @@ void Renderer::InitVulkan() {
 void Renderer::DeInitVulkan() {
     CleanupSwapchain();
 
+    DestroyIndexBuffer();
     DestroyVertexBuffer();
 
     DestroySemaphores();
@@ -652,7 +654,7 @@ void Renderer::CreateCommandPools() {
 }
 
 void Renderer::CreateVertexBuffer() {
-    VkDeviceSize bufferSize = sizeof(scene->getVertices()[0]) * scene->getVertices().size();
+    VkDeviceSize bufferSize = sizeof(scene->GetVertices()[0]) * scene->GetVertices().size();
 
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
@@ -663,7 +665,7 @@ void Renderer::CreateVertexBuffer() {
     // map and copy the vertices to slow ram
     void *data;
     vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-    memcpy(data, scene->getVertices().data(), static_cast<size_t>(bufferSize));
+    memcpy(data, scene->GetVertices().data(), static_cast<size_t>(bufferSize));
     vkUnmapMemory(device, stagingBufferMemory);
 
     VulkanMemory::CreateBufferAndBindMemory(device, physicalDevice, bufferSize,
@@ -683,6 +685,33 @@ void Renderer::CreateVertexBuffer() {
 void Renderer::DestroyVertexBuffer() {
     vkDestroyBuffer(device, vertexBuffer, nullptr);
     vkFreeMemory(device, vertexBufferMemory, nullptr);
+}
+
+void Renderer::CreateIndexBuffer() {
+    VkDeviceSize bufferSize = sizeof(scene->GetIndices()[0]) * scene->GetIndices().size();
+
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
+
+    VulkanMemory::CreateBufferAndBindMemory(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+    void* data;
+    vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
+    memcpy(data, scene->GetIndices().data(), static_cast<size_t>(bufferSize));
+    vkUnmapMemory(device, stagingBufferMemory);
+
+    VulkanMemory::CreateBufferAndBindMemory(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
+
+    VkCommandBuffer copyCommand = VulkanCommand::CreateCopyBufferCommand(device, transferCommandPool, stagingBuffer, indexBuffer, bufferSize);
+    VulkanCommand::SyncExecuteSingleCommand(device, transferCommandPool, transferQueue, copyCommand);
+
+    vkDestroyBuffer(device, stagingBuffer, nullptr);
+    vkFreeMemory(device, stagingBufferMemory, nullptr);
+}
+
+void Renderer::DestroyIndexBuffer() {
+    vkDestroyBuffer(device, indexBuffer, nullptr);
+    vkFreeMemory(device, indexBufferMemory, nullptr);
 }
 
 void Renderer::CreateCommandBuffers() {
@@ -723,7 +752,9 @@ void Renderer::CreateCommandBuffers() {
         VkDeviceSize offsets[] = {0};
         vkCmdBindVertexBuffers(graphicCommandBuffers[i], 0, 1, vertexBuffers, offsets);
 
-        vkCmdDraw(graphicCommandBuffers[i], static_cast<uint32_t>(scene->getVertices().size()), 1, 0, 0);
+        vkCmdBindIndexBuffer(graphicCommandBuffers[i], indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+
+        vkCmdDrawIndexed(graphicCommandBuffers[i], static_cast<uint32_t>(scene->GetIndices().size()), 1, 0, 0, 0);
 
         vkCmdEndRenderPass(graphicCommandBuffers[i]);
 

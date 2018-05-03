@@ -12,11 +12,13 @@ class Scene {
 
 private:
     std::vector<Vertex> vertices;
+    std::vector<uint32_t> indices;
 
 public:
     Scene();
 
-    std::vector<Vertex> getVertices();
+    std::vector<Vertex> GetVertices();
+    std::vector<uint32_t> GetIndices();
 
 };
 
