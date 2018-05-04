@@ -17,6 +17,15 @@ class QueueFamilyIndices;
 
 class Renderer {
 
+public:
+
+    Renderer(std::shared_ptr<Scene> scene, int width, int height);
+    ~Renderer();
+
+    bool Run();
+
+    void RecreateSwapchain();
+
 private:
     // Variables
     std::shared_ptr<Window> window;
@@ -39,6 +48,7 @@ private:
     std::vector<VkFramebuffer> swapchainFramebuffers;
 
     VkRenderPass renderPass;
+    VkDescriptorSetLayout descriptorSetLayout;
     VkPipelineLayout pipelineLayout;
     VkPipeline graphicsPipeline;
 
@@ -46,6 +56,8 @@ private:
     VkDeviceMemory vertexBufferMemory;
     VkBuffer indexBuffer;
     VkDeviceMemory indexBufferMemory;
+    VkBuffer uniformBuffer;
+    VkDeviceMemory uniformBufferMemory;
 
     VkCommandPool graphicCommandPool;
     VkCommandPool transferCommandPool;
@@ -86,6 +98,9 @@ private:
     void CreateRenderPass();
     void DestroyRenderPass();
 
+    void CreateDescriptorSetLayout();
+    void DestroyDescriptorSetLayout();
+
     void CreateGraphicsPipeline();
     void DestroyGraphicsPipeline();
 
@@ -97,6 +112,10 @@ private:
 
     void CreateIndexBuffer();
     void DestroyIndexBuffer();
+
+    void CreateUniformBuffer();
+    void UpdateUniformBuffer();
+    void DestroyUniformBuffer();
 
     void CreateCommandPools();
     void DestroyCommandPools();
@@ -128,15 +147,6 @@ private:
                                        const VkAllocationCallbacks *pAllocator);
 
     VkShaderModule CreateShaderModule(const std::vector<char> &code);
-
-public:
-
-    Renderer(std::shared_ptr<Scene> scene, int width, int height);
-    ~Renderer();
-
-    bool Run();
-
-    void RecreateSwapchain();
 
 };
 

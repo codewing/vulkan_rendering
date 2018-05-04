@@ -19,6 +19,7 @@
 #include "VulkanMemory.h"
 #include "VulkanDevice.h"
 #include "VulkanCommand.h"
+#include "UniformBufferObject.h"
 
 Renderer::Renderer(std::shared_ptr<Scene> scene, int width, int height) {
     window = std::make_shared<Window>(this, width, height);
@@ -39,11 +40,15 @@ void Renderer::InitVulkan() {
     CreateSwapchain();
     CreateImageViews();
     CreateRenderPass();
+    CreateDescriptorSetLayout();
     CreateGraphicsPipeline();
     CreateFramebuffers();
     CreateCommandPools();
+
     CreateVertexBuffer();
     CreateIndexBuffer();
+    CreateUniformBuffer();
+
     CreateCommandBuffers();
     CreateSemaphores();
 }
@@ -51,6 +56,9 @@ void Renderer::InitVulkan() {
 void Renderer::DeInitVulkan() {
     CleanupSwapchain();
 
+    DestroyDescriptorSetLayout();
+
+    DestroyUniformBuffer();
     DestroyIndexBuffer();
     DestroyVertexBuffer();
 
@@ -190,6 +198,7 @@ bool Renderer::Run() {
     if (window != nullptr) {
         bool running = window->Update();
 
+        UpdateUniformBuffer();
         DrawFrame();
 
         return running;
@@ -534,8 +543,8 @@ void Renderer::CreateGraphicsPipeline() {
 
     VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 0; // Optional
-    pipelineLayoutInfo.pSetLayouts = nullptr; // Optional
+    pipelineLayoutInfo.setLayoutCount = 1;
+    pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout;
     pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
     pipelineLayoutInfo.pPushConstantRanges = 0; // Optional
 
@@ -712,6 +721,24 @@ void Renderer::CreateIndexBuffer() {
 void Renderer::DestroyIndexBuffer() {
     vkDestroyBuffer(device, indexBuffer, nullptr);
     vkFreeMemory(device, indexBufferMemory, nullptr);
+}
+
+
+void Renderer::CreateUniformBuffer() {
+    VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+    VulkanMemory::CreateBufferAndBindMemory(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffer, uniformBufferMemory);
+}
+
+void Renderer::UpdateUniformBuffer() {
+    void* data;
+    vkMapMemory(device, uniformBufferMemory, 0, sizeof(UniformBufferObject), 0, &data);
+    memcpy(data, &(scene->GetActiveCamera()), sizeof(UniformBufferObject));
+    vkUnmapMemory(device, uniformBufferMemory);
+}
+
+void Renderer::DestroyUniformBuffer() {
+    vkDestroyBuffer(device, uniformBuffer, nullptr);
+    vkFreeMemory(device, uniformBufferMemory, nullptr);
 }
 
 void Renderer::CreateCommandBuffers() {
@@ -942,6 +969,23 @@ VkShaderModule Renderer::CreateShaderModule(const std::vector<char> &code) {
     return shaderModule;
 }
 
+void Renderer::CreateDescriptorSetLayout() {
+    VkDescriptorSetLayoutBinding uboLayoutBinding {};
+    uboLayoutBinding.binding = 0;
+    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    uboLayoutBinding.descriptorCount = 1;
+    uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    uboLayoutBinding.pImmutableSamplers = nullptr;
 
+    VkDescriptorSetLayoutCreateInfo layoutInfo {};
+    layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    layoutInfo.bindingCount = 1;
+    layoutInfo.pBindings = &uboLayoutBinding;
 
+    ErrorCheck(vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayout));
+}
+
+void Renderer::DestroyDescriptorSetLayout() {
+    vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+}
 
