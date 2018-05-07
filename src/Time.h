@@ -12,8 +12,6 @@ class Time {
 
 private:
 
-    std::chrono::time_point startTime;
-    std::chrono::time_point timeLastFrame;
 
     // Per frame updated values
     float deltaSinceStart;

@@ -5,11 +5,12 @@
 #include "Time.h"
 
 Time::Time() {
-    startTime = std::chrono::high_resolution_clock::now();
-    timeLastFrame = startTime;
+
 }
 
 void Time::UpdateTime() {
+    static auto startTime = std::chrono::high_resolution_clock::now();
+    static auto timeLastFrame = startTime;
     auto currentTime = std::chrono::high_resolution_clock::now();
 
     deltaSinceStart = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();

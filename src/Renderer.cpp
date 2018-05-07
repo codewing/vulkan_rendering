@@ -44,11 +44,11 @@ void Renderer::InitVulkan() {
     CreateGraphicsPipeline();
     CreateFramebuffers();
     CreateCommandPools();
-
     CreateVertexBuffer();
     CreateIndexBuffer();
     CreateUniformBuffer();
-
+    CreateDescriptorPool();
+    CreateDescriptorSet();
     CreateCommandBuffers();
     CreateSemaphores();
 }
@@ -56,6 +56,7 @@ void Renderer::InitVulkan() {
 void Renderer::DeInitVulkan() {
     CleanupSwapchain();
 
+    DestroyDescriptorPool();
     DestroyDescriptorSetLayout();
 
     DestroyUniformBuffer();
@@ -495,7 +496,7 @@ void Renderer::CreateGraphicsPipeline() {
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
     rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-    rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+    rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
     rasterizer.depthBiasConstantFactor = 0.0f; // Optional
     rasterizer.depthBiasClamp = 0.0f; // Optional
@@ -781,6 +782,9 @@ void Renderer::CreateCommandBuffers() {
 
         vkCmdBindIndexBuffer(graphicCommandBuffers[i], indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 
+        vkCmdBindDescriptorSets(graphicCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1,
+                                &descriptorSet, 0, nullptr);
+
         vkCmdDrawIndexed(graphicCommandBuffers[i], static_cast<uint32_t>(scene->GetIndices().size()), 1, 0, 0, 0);
 
         vkCmdEndRenderPass(graphicCommandBuffers[i]);
@@ -987,5 +991,52 @@ void Renderer::CreateDescriptorSetLayout() {
 
 void Renderer::DestroyDescriptorSetLayout() {
     vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+}
+
+void Renderer::CreateDescriptorPool() {
+    VkDescriptorPoolSize poolSize {};
+    poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    poolSize.descriptorCount = 1;
+
+    VkDescriptorPoolCreateInfo poolCreateInfo {};
+    poolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    poolCreateInfo.poolSizeCount = 1;
+    poolCreateInfo.pPoolSizes = &poolSize;
+    poolCreateInfo.maxSets = 1;
+
+    ErrorCheck(vkCreateDescriptorPool(device, &poolCreateInfo, nullptr, &descriptorPool));
+}
+
+void Renderer::DestroyDescriptorPool() {
+    vkDestroyDescriptorPool(device, descriptorPool, nullptr);
+}
+
+void Renderer::CreateDescriptorSet() {
+    VkDescriptorSetLayout layouts[] = {descriptorSetLayout};
+    VkDescriptorSetAllocateInfo allocInfo {};
+    allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    allocInfo.descriptorPool = descriptorPool;
+    allocInfo.descriptorSetCount = 1;
+    allocInfo.pSetLayouts = layouts;
+
+    ErrorCheck(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
+
+    VkDescriptorBufferInfo bufferInfo {};
+    bufferInfo.buffer = uniformBuffer;
+    bufferInfo.offset = 0;
+    bufferInfo.range = sizeof(UniformBufferObject);
+
+    VkWriteDescriptorSet descriptorWrite {};
+    descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    descriptorWrite.dstSet = descriptorSet;
+    descriptorWrite.dstBinding = 0;
+    descriptorWrite.dstArrayElement = 0;
+    descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    descriptorWrite.descriptorCount = 1;
+    descriptorWrite.pBufferInfo = &bufferInfo;
+    descriptorWrite.pImageInfo = nullptr; // Optional
+    descriptorWrite.pTexelBufferView = nullptr; // Optional
+
+    vkUpdateDescriptorSets(device, 1, &descriptorWrite, 0, nullptr);
 }
 

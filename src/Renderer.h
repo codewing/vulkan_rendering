@@ -63,6 +63,9 @@ private:
     VkCommandPool transferCommandPool;
     std::vector<VkCommandBuffer> graphicCommandBuffers;
 
+    VkDescriptorPool descriptorPool;
+    VkDescriptorSet descriptorSet;
+
     VkSemaphore imageAvailableSemaphore;
     VkSemaphore renderFinishedSemaphore;
 
@@ -121,6 +124,10 @@ private:
     void DestroyCommandPools();
 
     void CreateCommandBuffers();
+
+    void CreateDescriptorPool();
+    void DestroyDescriptorPool();
+    void CreateDescriptorSet();
 
     void DrawFrame();
 
