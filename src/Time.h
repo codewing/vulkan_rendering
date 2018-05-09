@@ -11,9 +11,6 @@
 class Time {
 
 private:
-
-
-    // Per frame updated values
     float deltaSinceStart;
     float deltaTime;
 
