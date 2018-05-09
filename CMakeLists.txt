@@ -12,12 +12,14 @@ add_executable(vulkan_voxel ${SOURCE_FILES})
 
 set(GLFW_DIR    libs/glfw)
 set(GLM_DIR     libs/glm)
+set(STB_DIR     libs/stb)
 
 add_subdirectory(${GLFW_DIR})
 include_directories(${GLFW_DIR}/include)
 target_link_libraries(vulkan_voxel glfw ${GLFW_LIBRARIES})
 
 include_directories(${GLM_DIR})
+include_directories(${STB_DIR})
 
 find_package(Vulkan REQUIRED)
 if (Vulkan_FOUND)
