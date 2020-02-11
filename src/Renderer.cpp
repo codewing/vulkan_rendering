@@ -345,7 +345,7 @@ void Renderer::CreateSwapchain() {
     }
 
     swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-    swapchainCreateInfo.queueFamilyIndexCount = queueFamilyIndices.size();
+    swapchainCreateInfo.queueFamilyIndexCount = static_cast<uint32_t>(queueFamilyIndices.size());
     swapchainCreateInfo.pQueueFamilyIndices = queueFamilyIndices.data();
 
     swapchainCreateInfo.preTransform = swapchainDetails.capabilities.currentTransform;

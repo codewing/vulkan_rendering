@@ -45,9 +45,6 @@ void ErrorCheck(VkResult result) {
             case VK_ERROR_FORMAT_NOT_SUPPORTED:
                 std::cout << "VK_ERROR_FORMAT_NOT_SUPPORTED" << std::endl;
                 break;
-            case VK_ERROR_FRAGMENTED_POOL:
-                std::cout << "VK_ERROR_FRAGMENTED_POOL" << std::endl;
-                break;
             case VK_ERROR_SURFACE_LOST_KHR:
                 std::cout << "VK_ERROR_SURFACE_LOST_KHR" << std::endl;
                 break;
@@ -68,9 +65,6 @@ void ErrorCheck(VkResult result) {
                 break;
             case VK_ERROR_INVALID_SHADER_NV:
                 std::cout << "VK_ERROR_INVALID_SHADER_NV" << std::endl;
-                break;
-            case VK_ERROR_OUT_OF_POOL_MEMORY_KHR:
-                std::cout << "VK_ERROR_OUT_OF_POOL_MEMORY_KHR" << std::endl;
                 break;
             default:
                 break;
