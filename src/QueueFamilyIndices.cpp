@@ -2,7 +2,6 @@
 // Created by codewing on 21/10/2017.
 //
 
-#include <stdint-gcc.h>
 #include "QueueFamilyIndices.h"
 
 bool QueueFamilyIndices::isGraphicsWithPresentFamilySet() {

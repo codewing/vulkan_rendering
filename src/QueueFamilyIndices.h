@@ -5,6 +5,7 @@
 #ifndef VULKAN_VOXEL_QUEUEFAMILYINDICES_H
 #define VULKAN_VOXEL_QUEUEFAMILYINDICES_H
 
+#include <cstdint>
 
 class QueueFamilyIndices {
 
