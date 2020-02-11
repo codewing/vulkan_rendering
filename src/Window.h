@@ -6,7 +6,8 @@
 #define VULKAN_VOXEL_WINDOW_H
 
 #include "Renderer.h"
-#include "GLFW/glfw3.h"
+
+struct GLFWwindow;
 
 class Window {
 
