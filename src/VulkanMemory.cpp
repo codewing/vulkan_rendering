@@ -21,7 +21,7 @@ VulkanMemory::FindMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilte
     throw std::runtime_error("failed to find suitable memory type!");
 }
 
-void VulkanMemory::CreateBufferAndBindMemory(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize size,
+void VulkanMemory::CreateBufferAndBindMemory(const VkDevice& device, const VkPhysicalDevice& physicalDevice, VkDeviceSize size,
                                              VkBufferUsageFlags usageFlags,
                                              VkMemoryPropertyFlags memoryPropertyFlags, VkBuffer &buffer,
                                              VkDeviceMemory &bufferMemory) {
@@ -34,10 +34,10 @@ void VulkanMemory::CreateBufferAndBindMemory(VkDevice device, VkPhysicalDevice p
 
     ErrorCheck(vkCreateBuffer(device, &bufferCreateInfo, nullptr, &buffer));
 
-    // check the memory requirements
-    VkMemoryRequirements memRequirements;
-    vkGetBufferMemoryRequirements(device, buffer, &memRequirements);
+    AllocateMemoryBuffer(device, physicalDevice, buffer, &bufferMemory, memoryPropertyFlags);
+}
 
+void VulkanMemory::AllocateMemory(const VkDevice &device, const VkPhysicalDevice &physicalDevice, VkDeviceMemory* bufferMemory, VkMemoryPropertyFlags memoryPropertyFlags, const VkMemoryRequirements& memRequirements) {
     // allocate memory based on requirements
     VkMemoryAllocateInfo memoryAllocateInfo{};
     memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -48,8 +48,30 @@ void VulkanMemory::CreateBufferAndBindMemory(VkDevice device, VkPhysicalDevice p
             memoryPropertyFlags
     );
 
-    ErrorCheck(vkAllocateMemory(device, &memoryAllocateInfo, nullptr, &bufferMemory));
+    ErrorCheck(vkAllocateMemory(device, &memoryAllocateInfo, nullptr, bufferMemory));
+}
 
-    // bind the memory
-    vkBindBufferMemory(device, buffer, bufferMemory, 0);
+void
+VulkanMemory::AllocateMemoryBuffer(const VkDevice &device, const VkPhysicalDevice &physicalDevice, VkBuffer &buffer,
+                                   VkDeviceMemory *bufferMemory, VkMemoryPropertyFlags memoryPropertyFlags) {
+    // check the buffer memory requirements
+    VkMemoryRequirements memRequirements;
+    vkGetBufferMemoryRequirements(device, buffer, &memRequirements);
+
+    AllocateMemory(device, physicalDevice, bufferMemory, memoryPropertyFlags, memRequirements);
+
+    // bind the buffer memory
+    vkBindBufferMemory(device, buffer, *bufferMemory, 0);
+}
+
+void VulkanMemory::AllocateMemoryImage(const VkDevice &device, const VkPhysicalDevice &physicalDevice, VkImage &image,
+                                       VkDeviceMemory *imageMemory, VkMemoryPropertyFlags memoryPropertyFlags) {
+    // check the image memory requirements
+    VkMemoryRequirements memRequirements;
+    vkGetImageMemoryRequirements(device, image, &memRequirements);
+
+    AllocateMemory(device, physicalDevice, imageMemory, memoryPropertyFlags, memRequirements);
+
+    // bind the image memory
+    vkBindImageMemory(device, image, *imageMemory, 0);
 }

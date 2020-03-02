@@ -64,3 +64,17 @@ add_custom_target(
 
 add_dependencies(${PROJECT_NAME} Shaders)
 
+##################################
+#####   Copying the assets   #####
+##################################
+
+set(ASSET_FOLDERS textures)
+
+foreach(folder ${ASSET_FOLDERS})
+    add_custom_command(
+            TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+                    ${CMAKE_SOURCE_DIR}/${folder}
+                    ${CMAKE_CURRENT_BINARY_DIR}/${folder}
+    )
+endforeach()

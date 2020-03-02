@@ -2,8 +2,7 @@
 // Created by codewing on 20/10/2017.
 //
 
-#ifndef VULKAN_VOXEL_RENDERER_H
-#define VULKAN_VOXEL_RENDERER_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 #include <vector>
@@ -12,8 +11,8 @@
 #include "Scene.h"
 
 class Window;
-
 class QueueFamilyIndices;
+class VulkanImage;
 
 class Renderer {
 
@@ -58,6 +57,7 @@ private:
     VkDeviceMemory indexBufferMemory;
     VkBuffer uniformBuffer;
     VkDeviceMemory uniformBufferMemory;
+    std::shared_ptr<VulkanImage> texture = nullptr;
 
     VkCommandPool graphicCommandPool;
     VkCommandPool transferCommandPool;
@@ -136,6 +136,8 @@ private:
 
     bool CheckAllValidationLayersSupported();
 
+    void CreateTextureImage();
+
     std::vector<const char *> GetRequiredExtensions();
     bool IsDeviceSuitable(VkPhysicalDevice vkPhysicalDevice);
     bool CheckDeviceExtensionSupport(VkPhysicalDevice vkPhysicalDevice);
@@ -156,6 +158,3 @@ private:
     VkShaderModule CreateShaderModule(const std::vector<char> &code);
 
 };
-
-
-#endif //VULKAN_VOXEL_RENDERER_H

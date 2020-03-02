@@ -2,8 +2,7 @@
 // Created by codewing on 21/10/2017.
 //
 
-#ifndef VULKAN_VOXEL_QUEUEFAMILYINDICES_H
-#define VULKAN_VOXEL_QUEUEFAMILYINDICES_H
+#pragma once
 
 #include <cstdint>
 
@@ -32,6 +31,3 @@ public:
 
     void SetTransferFamily(uint32_t transferFamily);
 };
-
-
-#endif //VULKAN_VOXEL_QUEUEFAMILYINDICES_H

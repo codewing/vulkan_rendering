@@ -20,6 +20,8 @@
 #include "VulkanDevice.h"
 #include "VulkanCommand.h"
 #include "UniformBufferObject.h"
+#include "Image.h"
+#include "VulkanImage.h"
 
 Renderer::Renderer(std::shared_ptr<Scene> scene, int width, int height) {
     window = std::make_shared<Window>(this, width, height);
@@ -44,6 +46,7 @@ void Renderer::InitVulkan() {
     CreateGraphicsPipeline();
     CreateFramebuffers();
     CreateCommandPools();
+    CreateTextureImage();
     CreateVertexBuffer();
     CreateIndexBuffer();
     CreateUniformBuffer();
@@ -55,6 +58,8 @@ void Renderer::InitVulkan() {
 
 void Renderer::DeInitVulkan() {
     CleanupSwapchain();
+
+    texture->FreeImage();
 
     DestroyDescriptorPool();
     DestroyDescriptorSetLayout();
@@ -683,9 +688,7 @@ void Renderer::CreateVertexBuffer() {
                                             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
 
     // copy vertices from slow ram to fast ram
-    VkCommandBuffer copyCommand = VulkanCommand::CreateCopyBufferCommand(device, transferCommandPool, stagingBuffer,
-                                                                         vertexBuffer, bufferSize);
-    VulkanCommand::SyncExecuteSingleCommand(device, transferCommandPool, transferQueue, copyCommand);
+    VulkanCommand::CopyBuffer(device, transferCommandPool, stagingBuffer, vertexBuffer, bufferSize, transferQueue);
 
     // cleanup
     vkDestroyBuffer(device, stagingBuffer, nullptr);
@@ -712,8 +715,7 @@ void Renderer::CreateIndexBuffer() {
 
     VulkanMemory::CreateBufferAndBindMemory(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
 
-    VkCommandBuffer copyCommand = VulkanCommand::CreateCopyBufferCommand(device, transferCommandPool, stagingBuffer, indexBuffer, bufferSize);
-    VulkanCommand::SyncExecuteSingleCommand(device, transferCommandPool, transferQueue, copyCommand);
+    VulkanCommand::CopyBuffer(device, transferCommandPool, stagingBuffer, indexBuffer, bufferSize, transferQueue);
 
     vkDestroyBuffer(device, stagingBuffer, nullptr);
     vkFreeMemory(device, stagingBufferMemory, nullptr);
@@ -1038,5 +1040,29 @@ void Renderer::CreateDescriptorSet() {
     descriptorWrite.pTexelBufferView = nullptr; // Optional
 
     vkUpdateDescriptorSets(device, 1, &descriptorWrite, 0, nullptr);
+}
+
+void Renderer::CreateTextureImage() {
+    Image img("textures/statue.jpg");
+
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
+
+    VulkanMemory::CreateBufferAndBindMemory(device, physicalDevice, img.GetSize(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+    void* data;
+    vkMapMemory(device, stagingBufferMemory, 0, img.GetSize(), 0, &data);
+    memcpy(data, img.GetData(), img.GetSize());
+    vkUnmapMemory(device, stagingBufferMemory);
+
+    texture = std::make_shared<VulkanImage>(device, physicalDevice, img.GetWidth(), img.GetHeight(), VK_FORMAT_R8G8B8A8_SRGB,
+            VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+    texture->TransitionImageLayout(device, graphicCommandPool, graphicsQueue, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    texture->CopyBufferToImage(device, graphicCommandPool, graphicsQueue, stagingBuffer);
+    texture->TransitionImageLayout(device, graphicCommandPool, graphicsQueue, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+    vkDestroyBuffer(device, stagingBuffer, nullptr);
+    vkFreeMemory(device, stagingBufferMemory, nullptr);
 }
 
