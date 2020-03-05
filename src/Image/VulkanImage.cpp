@@ -3,8 +3,8 @@
 //
 
 #include "VulkanImage.h"
-#include "VulkanMemory.h"
-#include "VulkanCommand.h"
+#include "../VulkanMemory.h"
+#include "../VulkanCommand.h"
 
 #include <stdexcept>
 

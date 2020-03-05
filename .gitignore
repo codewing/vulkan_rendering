@@ -1,5 +1,6 @@
+# dev tools
 .idea/
 .vscode/
-cmake-build-*/
-build/
-shaders/*.spv
+
+# generated files
+*build*/

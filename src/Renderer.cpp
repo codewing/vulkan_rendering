@@ -21,7 +21,7 @@
 #include "VulkanCommand.h"
 #include "UniformBufferObject.h"
 #include "Image.h"
-#include "VulkanImage.h"
+#include "Image/VulkanImage.h"
 
 Renderer::Renderer(std::shared_ptr<Scene> scene, int width, int height) {
     window = std::make_shared<Window>(this, width, height);
@@ -439,8 +439,8 @@ void Renderer::DestroyImageViews() {
 
 void Renderer::CreateGraphicsPipeline() {
 
-    auto vertShaderCode = readFile("shaders/shader.vert.spv");
-    auto fragShaderCode = readFile("shaders/shader.frag.spv");
+    auto vertShaderCode = readFile("assets/shaders/shader.vert.spv");
+    auto fragShaderCode = readFile("assets/shaders/shader.frag.spv");
 
     VkShaderModule vertShaderModule = CreateShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = CreateShaderModule(fragShaderCode);
@@ -1043,7 +1043,7 @@ void Renderer::CreateDescriptorSet() {
 }
 
 void Renderer::CreateTextureImage() {
-    Image img("textures/statue.jpg");
+    Image img("assets/textures/statue.jpg");
 
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
