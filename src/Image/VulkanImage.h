@@ -28,7 +28,7 @@ public:
     void FreeImage();
 
     void CreateImageView();
-    
+    VkImageView GetImageView() { return imageView; };
     
     static VkImageView CreateImageViewForImage(VkDevice device, VkImage image, VkFormat format);
 };

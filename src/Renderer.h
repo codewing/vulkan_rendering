@@ -56,8 +56,8 @@ private:
     VkDeviceMemory vertexBufferMemory;
     VkBuffer indexBuffer;
     VkDeviceMemory indexBufferMemory;
-    VkBuffer uniformBuffer;
-    VkDeviceMemory uniformBufferMemory;
+    std::vector<VkBuffer> uniformBuffers;
+    std::vector<VkDeviceMemory> uniformBuffersMemory;
 
     std::shared_ptr<VulkanImage> texture = nullptr;
     std::shared_ptr<VulkanSampler> sampler = nullptr;
@@ -67,7 +67,7 @@ private:
     std::vector<VkCommandBuffer> graphicCommandBuffers;
 
     VkDescriptorPool descriptorPool;
-    VkDescriptorSet descriptorSet;
+    std::vector<VkDescriptorSet> descriptorSets;
 
     VkSemaphore imageAvailableSemaphore;
     VkSemaphore renderFinishedSemaphore;
@@ -119,9 +119,9 @@ private:
     void CreateIndexBuffer();
     void DestroyIndexBuffer();
 
-    void CreateUniformBuffer();
-    void UpdateUniformBuffer();
-    void DestroyUniformBuffer();
+    void CreateUniformBuffers();
+    void UpdateUniformBuffers(int currentImage);
+    void DestroyUniformBuffers();
 
     void CreateCommandPools();
     void DestroyCommandPools();
@@ -130,7 +130,7 @@ private:
 
     void CreateDescriptorPool();
     void DestroyDescriptorPool();
-    void CreateDescriptorSet();
+    void CreateDescriptorSets();
 
     void DrawFrame();
 

@@ -6,7 +6,7 @@
 #define VULKAN_VOXEL_SCENE_H
 
 #include <vector>
-#include "vertex.h"
+#include "Vertex.h"
 #include "UniformBufferObject.h"
 
 class Scene {

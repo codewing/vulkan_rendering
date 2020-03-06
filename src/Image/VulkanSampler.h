@@ -17,6 +17,8 @@ public:
 
     VulkanSampler(const VkDevice& device);
     void FreeSampler();
+
+    VkSampler GetSampler() { return sampler; };
 };
 
 
