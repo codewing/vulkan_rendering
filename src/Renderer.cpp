@@ -22,6 +22,7 @@
 #include "UniformBufferObject.h"
 #include "Image.h"
 #include "Image/VulkanImage.h"
+#include "Image/VulkanSampler.h"
 
 Renderer::Renderer(std::shared_ptr<Scene> scene, int width, int height) {
     window = std::make_shared<Window>(this, width, height);
@@ -47,6 +48,7 @@ void Renderer::InitVulkan() {
     CreateFramebuffers();
     CreateCommandPools();
     CreateTextureImage();
+    CreateTextureSampler();
     CreateVertexBuffer();
     CreateIndexBuffer();
     CreateUniformBuffer();
@@ -59,6 +61,7 @@ void Renderer::InitVulkan() {
 void Renderer::DeInitVulkan() {
     CleanupSwapchain();
 
+    sampler->FreeSampler();
     texture->FreeImage();
 
     DestroyDescriptorPool();
@@ -77,7 +80,7 @@ void Renderer::DeInitVulkan() {
     DestroyInstance();
 }
 
-void Renderer::CreateInstance() {
+void Renderer:: CreateInstance() {
 
 #ifdef BUILD_ENABLE_VULKAN_DEBUG
     if (!CheckAllValidationLayersSupported()) {
@@ -248,7 +251,10 @@ bool Renderer::IsDeviceSuitable(VkPhysicalDevice vkPhysicalDevice) {
         swapChainSupported = !swapChainDetails.formats.empty() && !swapChainDetails.presentModes.empty();
     }
 
-    return indices.isGraphicsWithPresentFamilySet() && swapChainSupported;
+    VkPhysicalDeviceFeatures supportedFeatures;
+    vkGetPhysicalDeviceFeatures(vkPhysicalDevice, &supportedFeatures);
+
+    return indices.isGraphicsWithPresentFamilySet() && swapChainSupported && supportedFeatures.samplerAnisotropy;
 }
 
 void Renderer::InitLogicalDevice() {
@@ -274,7 +280,8 @@ void Renderer::InitLogicalDevice() {
     }
 
 
-    VkPhysicalDeviceFeatures deviceFeatures{};
+    VkPhysicalDeviceFeatures deviceFeatures = {};
+    deviceFeatures.samplerAnisotropy = VK_TRUE;
 
     VkDeviceCreateInfo deviceCreateInfo{};
     deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -410,24 +417,7 @@ void Renderer::CreateImageViews() {
     swapchainImageViews.resize(swapchainImages.size());
 
     for (size_t i = 0; i < swapchainImages.size(); i++) {
-        VkImageViewCreateInfo imageViewCreateInfo{};
-        imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-        imageViewCreateInfo.image = swapchainImages[i];
-        imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-        imageViewCreateInfo.format = swapchainImageFormat;
-
-        imageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-        imageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-        imageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-        imageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-
-        imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
-        imageViewCreateInfo.subresourceRange.levelCount = 1;
-        imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
-        imageViewCreateInfo.subresourceRange.layerCount = 1;
-
-        ErrorCheck(vkCreateImageView(device, &imageViewCreateInfo, nullptr, &swapchainImageViews[i]));
+        swapchainImageViews[i] = VulkanImage::CreateImageViewForImage(device, swapchainImages[i], swapchainImageFormat);
     }
 }
 
@@ -1066,3 +1056,6 @@ void Renderer::CreateTextureImage() {
     vkFreeMemory(device, stagingBufferMemory, nullptr);
 }
 
+void Renderer::CreateTextureSampler() {
+    sampler = std::make_shared<VulkanSampler>(device);
+}

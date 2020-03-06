@@ -31,7 +31,7 @@ void ErrorCheck(VkResult result) {
                 std::cout << "VK_ERROR_LAYER_NOT_PRESENT" << std::endl;
                 break;
             case VK_ERROR_EXTENSION_NOT_PRESENT:
-                std::cout << VK_ERROR_EXTENSION_NOT_PRESENT << std::endl;
+                std::cout << "VK_ERROR_EXTENSION_NOT_PRESENT" << std::endl;
                 break;
             case VK_ERROR_FEATURE_NOT_PRESENT:
                 std::cout << "VK_ERROR_FEATURE_NOT_PRESENT" << std::endl;

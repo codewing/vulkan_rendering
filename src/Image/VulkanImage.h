@@ -9,8 +9,10 @@
 class VulkanImage {
 
 private:
-    VkImage textureImage = VK_NULL_HANDLE;
+    VkImage image = VK_NULL_HANDLE;
     VkDeviceMemory textureImageMemory = VK_NULL_HANDLE;
+
+    VkImageView imageView = VK_NULL_HANDLE;
 
     uint32_t width, height;
     const VkDevice& device;
@@ -24,6 +26,11 @@ public:
     void CopyBufferToImage(VkDevice device, VkCommandPool commandPool, VkQueue queue, VkBuffer buffer);
 
     void FreeImage();
+
+    void CreateImageView();
+    
+    
+    static VkImageView CreateImageViewForImage(VkDevice device, VkImage image, VkFormat format);
 };
 
 

@@ -13,6 +13,7 @@
 class Window;
 class QueueFamilyIndices;
 class VulkanImage;
+class VulkanSampler;
 
 class Renderer {
 
@@ -57,7 +58,9 @@ private:
     VkDeviceMemory indexBufferMemory;
     VkBuffer uniformBuffer;
     VkDeviceMemory uniformBufferMemory;
+
     std::shared_ptr<VulkanImage> texture = nullptr;
+    std::shared_ptr<VulkanSampler> sampler = nullptr;
 
     VkCommandPool graphicCommandPool;
     VkCommandPool transferCommandPool;
@@ -137,6 +140,7 @@ private:
     bool CheckAllValidationLayersSupported();
 
     void CreateTextureImage();
+    void CreateTextureSampler();
 
     std::vector<const char *> GetRequiredExtensions();
     bool IsDeviceSuitable(VkPhysicalDevice vkPhysicalDevice);

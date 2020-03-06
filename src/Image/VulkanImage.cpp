@@ -5,6 +5,7 @@
 #include "VulkanImage.h"
 #include "../VulkanMemory.h"
 #include "../VulkanCommand.h"
+#include "../Utilities.h"
 
 #include <stdexcept>
 
@@ -28,23 +29,47 @@ VulkanImage::VulkanImage(const VkDevice& device, const VkPhysicalDevice& physica
     imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     imageInfo.flags = 0; // Optional - e.g. sparse textures/volumes
 
-    if (vkCreateImage(device, &imageInfo, nullptr, &textureImage) != VK_SUCCESS) {
+    if (vkCreateImage(device, &imageInfo, nullptr, &image) != VK_SUCCESS) {
         throw std::runtime_error("failed to create VulkanImage!");
     }
 
-    VulkanMemory::AllocateMemoryImage(device, physicalDevice, textureImage, &textureImageMemory, properties);
+    VulkanMemory::AllocateMemoryImage(device, physicalDevice, image, &textureImageMemory, properties);
 
 }
 
 void VulkanImage::TransitionImageLayout(VkDevice device, VkCommandPool commandPool, VkQueue queue, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {
-    VulkanCommand::TransitionImageLayout(device, commandPool, queue, textureImage, format, oldLayout, newLayout);
+    VulkanCommand::TransitionImageLayout(device, commandPool, queue, image, format, oldLayout, newLayout);
 }
 
 void VulkanImage::CopyBufferToImage(VkDevice device, VkCommandPool commandPool, VkQueue queue, VkBuffer buffer) {
-    VulkanCommand::CopyBufferToImage(device, commandPool, queue, buffer, textureImage, width, height);
+    VulkanCommand::CopyBufferToImage(device, commandPool, queue, buffer, image, width, height);
 }
 
 void VulkanImage::FreeImage() {
-    vkDestroyImage(device, textureImage, nullptr);
+    vkDestroyImageView(device, imageView, nullptr);
+
+    vkDestroyImage(device, image, nullptr);
     vkFreeMemory(device, textureImageMemory, nullptr);
+}
+
+void VulkanImage::CreateImageView() {
+    imageView = CreateImageViewForImage(device, image, VK_FORMAT_R8G8B8A8_SRGB);
+}
+
+VkImageView VulkanImage::CreateImageViewForImage(VkDevice device, VkImage image, VkFormat format) {
+    VkImageViewCreateInfo viewInfo = {};
+    viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    viewInfo.image = image;
+    viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    viewInfo.format = format;
+    viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    viewInfo.subresourceRange.baseArrayLayer = 0;
+    viewInfo.subresourceRange.baseMipLevel = 0;
+    viewInfo.subresourceRange.layerCount = 1;
+    viewInfo.subresourceRange.levelCount = 1;
+
+    VkImageView imageView;
+    ErrorCheck(vkCreateImageView(device, &viewInfo, nullptr, &imageView));
+
+    return imageView;
 }
