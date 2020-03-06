@@ -1013,13 +1013,13 @@ void Renderer::CreateDescriptorPool() {
     poolSizes[0].descriptorCount = static_cast<uint32_t>(swapchainImages.size());
 
     poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    poolSizes[0].descriptorCount = static_cast<uint32_t>(swapchainImages.size());
+    poolSizes[1].descriptorCount = static_cast<uint32_t>(swapchainImages.size());
 
     VkDescriptorPoolCreateInfo poolCreateInfo {};
     poolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     poolCreateInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
     poolCreateInfo.pPoolSizes = poolSizes.data();
-    poolCreateInfo.maxSets = static_cast<uint32_t>(poolSizes.size());
+    poolCreateInfo.maxSets = static_cast<uint32_t>(swapchainImages.size());
 
     ErrorCheck(vkCreateDescriptorPool(device, &poolCreateInfo, nullptr, &descriptorPool));
 }
@@ -1096,6 +1096,8 @@ void Renderer::CreateTextureImage() {
 
     vkDestroyBuffer(device, stagingBuffer, nullptr);
     vkFreeMemory(device, stagingBufferMemory, nullptr);
+
+    texture->CreateImageView();
 }
 
 void Renderer::CreateTextureSampler() {
