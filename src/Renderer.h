@@ -46,6 +46,7 @@ private:
     VkFormat swapchainImageFormat;
     VkExtent2D swapchainExtent;
     std::vector<VkFramebuffer> swapchainFramebuffers;
+    std::shared_ptr<VulkanImage> depthImage = nullptr;
 
     VkRenderPass renderPass;
     VkDescriptorSetLayout descriptorSetLayout;
@@ -139,6 +140,9 @@ private:
 
     bool CheckAllValidationLayersSupported();
 
+    void CreateDepthResources();
+    void DestroyDepthResources();
+
     void CreateTextureImage();
     void CreateTextureSampler();
 
@@ -149,6 +153,9 @@ private:
     VkSurfaceFormatKHR ChooseSwapchainSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
     VkPresentModeKHR ChooseSwapchainPresentMode(const std::vector<VkPresentModeKHR> availablePresentModes);
     VkExtent2D ChooseSwapchainExtent(const VkSurfaceCapabilitiesKHR &capabilities);
+    VkFormat FindSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+    VkFormat FindDepthBufferFormat();
+    bool HasStencilComponent(VkFormat format);
 
     void SetupDebugCallbacks();
     static VKAPI_ATTR VkBool32 VKAPI_CALL

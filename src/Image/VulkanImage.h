@@ -10,7 +10,7 @@ class VulkanImage {
 
 private:
     VkImage image = VK_NULL_HANDLE;
-    VkDeviceMemory textureImageMemory = VK_NULL_HANDLE;
+    VkDeviceMemory imageMemory = VK_NULL_HANDLE;
 
     VkImageView imageView = VK_NULL_HANDLE;
 
@@ -27,10 +27,10 @@ public:
 
     void FreeImage();
 
-    void CreateImageView();
+    void CreateImageView(VkFormat format, VkImageAspectFlags aspectFlags);
     VkImageView GetImageView() { return imageView; };
     
-    static VkImageView CreateImageViewForImage(VkDevice device, VkImage image, VkFormat format);
+    static VkImageView CreateImageViewForImage(VkDevice device, VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 };
 
 

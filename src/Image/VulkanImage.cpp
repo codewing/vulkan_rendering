@@ -33,7 +33,7 @@ VulkanImage::VulkanImage(const VkDevice& device, const VkPhysicalDevice& physica
         throw std::runtime_error("failed to create VulkanImage!");
     }
 
-    VulkanMemory::AllocateMemoryImage(device, physicalDevice, image, &textureImageMemory, properties);
+    VulkanMemory::AllocateMemoryImage(device, physicalDevice, image, &imageMemory, properties);
 
 }
 
@@ -49,20 +49,20 @@ void VulkanImage::FreeImage() {
     vkDestroyImageView(device, imageView, nullptr);
 
     vkDestroyImage(device, image, nullptr);
-    vkFreeMemory(device, textureImageMemory, nullptr);
+    vkFreeMemory(device, imageMemory, nullptr);
 }
 
-void VulkanImage::CreateImageView() {
-    imageView = CreateImageViewForImage(device, image, VK_FORMAT_R8G8B8A8_SRGB);
+void VulkanImage::CreateImageView(VkFormat format, VkImageAspectFlags aspectFlags) {
+    imageView = CreateImageViewForImage(device, image, format, aspectFlags);
 }
 
-VkImageView VulkanImage::CreateImageViewForImage(VkDevice device, VkImage image, VkFormat format) {
+VkImageView VulkanImage::CreateImageViewForImage(VkDevice device, VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
     VkImageViewCreateInfo viewInfo = {};
     viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     viewInfo.image = image;
     viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
     viewInfo.format = format;
-    viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    viewInfo.subresourceRange.aspectMask = aspectFlags;
     viewInfo.subresourceRange.baseArrayLayer = 0;
     viewInfo.subresourceRange.baseMipLevel = 0;
     viewInfo.subresourceRange.layerCount = 1;
