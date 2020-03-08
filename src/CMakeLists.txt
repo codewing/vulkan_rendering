@@ -16,6 +16,8 @@ target_link_libraries(vulkan_voxel PRIVATE glm)
 
 target_link_libraries(vulkan_voxel PRIVATE stb_image)
 
+target_link_libraries(vulkan_voxel PRIVATE tiny_obj_loader)
+
 # Dependency - Assets
 add_dependencies(vulkan_voxel Shaders)
 add_dependencies(vulkan_voxel Assets)
