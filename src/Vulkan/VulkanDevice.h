@@ -2,8 +2,7 @@
 // Created by codewing on 24/04/2018.
 //
 
-#ifndef VULKAN_VOXEL_VULKANDEVICE_H
-#define VULKAN_VOXEL_VULKANDEVICE_H
+#pragma once
 
 
 #include <vulkan/vulkan.h>
@@ -21,6 +20,3 @@ public:
     FindQueueFamilies(VkPhysicalDevice vkPhysicalDevice, VkSurfaceKHR surface, QueueFamilyType type);
 
 };
-
-
-#endif //VULKAN_VOXEL_VULKANDEVICE_H

@@ -2,8 +2,7 @@
 // Created by codewing on 23/04/2018.
 //
 
-#ifndef VULKAN_VOXEL_VULKANMEMORY_H
-#define VULKAN_VOXEL_VULKANMEMORY_H
+#pragma once
 
 
 #include <vulkan/vulkan.h>
@@ -32,6 +31,3 @@ public:
     static void CopyMemoryToGpu(VkDevice device, VkDeviceMemory deviceMemory, void* data, size_t size);
 
 };
-
-
-#endif //VULKAN_VOXEL_VULKANMEMORY_H

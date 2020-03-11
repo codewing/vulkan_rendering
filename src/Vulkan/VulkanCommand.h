@@ -2,8 +2,7 @@
 // Created by codewing on 24/04/2018.
 //
 
-#ifndef VULKAN_VOXEL_VULKANCOMMAND_H
-#define VULKAN_VOXEL_VULKANCOMMAND_H
+#pragma once
 
 
 #include "VulkanDevice.h"
@@ -26,6 +25,3 @@ public:
     static void CopyBufferToImage(VkDevice device, VkCommandPool commandPool, VkQueue queue, VkBuffer buffer,
                             VkImage image, uint32_t width, uint32_t height);
 };
-
-
-#endif //VULKAN_VOXEL_VULKANCOMMAND_H

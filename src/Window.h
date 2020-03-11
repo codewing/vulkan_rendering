@@ -1,44 +1,35 @@
 //
-// Created by codewing on 20/10/2017.
+// Created by codewing on 11/03/2020.
 //
 
-#ifndef VULKAN_VOXEL_WINDOW_H
-#define VULKAN_VOXEL_WINDOW_H
+#pragma once
 
-#include "Renderer.h"
-
-struct GLFWwindow;
+#include <vulkan/vulkan.h>
+#include <string>
+#include <functional>
 
 class Window {
 
-private:
-    GLFWwindow *window = nullptr;
-    Renderer *renderer = nullptr;
+protected:
 
-    const int WINDOW_WIDTH;
-    const int WINDOW_HEIGHT;
-
+    int width, height;
+    std::string name;
     bool running;
 
-    void InitWindow();
-
-    void CleanUp();
-
-    static void FramebufferResizedCB(GLFWwindow *window, int width, int height);
+    virtual void CleanUp() {};
+    virtual void Initialize() {};
 
 public:
-    Window(Renderer *renderer, int width, int height);
+    // Bound by the renderer
+    std::function<void()> OnResizedEvent;
 
-    ~Window();
+    Window(std::string name, int width, int height);
+    virtual ~Window();
 
-    bool Update();
+    virtual bool Update() = 0;
+    virtual bool CreateSurface(VkInstance instance, VkSurfaceKHR* surface) = 0;
 
-    GLFWwindow *GetGLFWwindow();
+    const int Width() const { return width; };
+    const int Height() const { return height; };
 
-    const int GetWidth() const;
-
-    const int GetHeight() const;
 };
-
-
-#endif //VULKAN_VOXEL_WINDOW_H

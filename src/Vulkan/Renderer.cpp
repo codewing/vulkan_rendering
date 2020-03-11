@@ -1,32 +1,32 @@
 //
 // Created by codewing on 20/10/2017.
 //
-#include "BUILD_OPTIONS.h"
-
-#include "Renderer.h"
-#include "Utilities.h"
 
 #define GLFW_INCLUDE_VULKAN
-
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <cstring>
 #include <set>
 #include <algorithm>
-#include "Window.h"
+
+#include "../BUILD_OPTIONS.h"
+#include "../Image.h"
+#include "../UniformBufferObject.h"
+#include "../Utilities.h"
+#include "../Vertex.h"
+#include "../Window.h"
+
+#include "Renderer.h"
 #include "QueueFamilyIndices.h"
-#include "Vertex.h"
 #include "VulkanMemory.h"
 #include "VulkanDevice.h"
 #include "VulkanCommand.h"
-#include "UniformBufferObject.h"
-#include "Image.h"
 #include "Image/VulkanImage.h"
 #include "Image/VulkanSampler.h"
+#include "VulkanUtilities.h"
 
-Renderer::Renderer(std::shared_ptr<Scene> scene, int width, int height) {
-    window = std::make_shared<Window>(this, width, height);
-    this->scene = scene;
+Renderer::Renderer(std::shared_ptr<Scene> scene, std::shared_ptr<Window> window) : window(window), scene(scene) {
+    window->OnResizedEvent = [&]() { RecreateSwapchain(); };
     InitVulkan();
 }
 
@@ -65,10 +65,8 @@ void Renderer::DeInitVulkan() {
     sampler->FreeSampler();
     texture->FreeImage();
 
-    DestroyDescriptorPool();
     DestroyDescriptorSetLayout();
 
-    DestroyUniformBuffers();
     DestroyIndexBuffer();
     DestroyVertexBuffer();
 
@@ -311,9 +309,7 @@ void Renderer::DeInitLogicalDevice() {
 }
 
 void Renderer::CreateSurface() {
-    if (glfwCreateWindowSurface(instance, window->GetGLFWwindow(), nullptr, &surface) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create window surface!");
-    }
+    window->CreateSurface(instance, &surface);
 }
 
 void Renderer::DestroySurface() {
@@ -380,8 +376,9 @@ void Renderer::DestroySwapchain() {
 }
 
 void Renderer::RecreateSwapchain() {
-    int width, height;
-    glfwGetWindowSize(window->GetGLFWwindow(), &width, &height);
+    int width = window->Width();
+    int height = window->Height();
+
     if (width == 0 || height == 0) return;
 
     vkDeviceWaitIdle(device);
@@ -403,7 +400,6 @@ void Renderer::RecreateSwapchain() {
 void Renderer::CleanupSwapchain() {
     DestroyDepthResources();
 
-
     DestroyFramebuffers();
     vkFreeCommandBuffers(device, graphicCommandPool, static_cast<uint32_t>(graphicCommandBuffers.size()),
                          graphicCommandBuffers.data());
@@ -411,6 +407,8 @@ void Renderer::CleanupSwapchain() {
     DestroyRenderPass();
     DestroyImageViews();
     DestroySwapchain();
+    DestroyUniformBuffers();
+    DestroyDescriptorPool();
 }
 
 void Renderer::GetSwapchainImages() {
@@ -992,8 +990,8 @@ VkExtent2D Renderer::ChooseSwapchainExtent(const VkSurfaceCapabilitiesKHR &capab
     if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
         return capabilities.currentExtent;
     } else {
-        int width, height;
-        glfwGetWindowSize(window->GetGLFWwindow(), &width, &height);
+        int width = window->Width();
+        int height = window->Height();
 
         VkExtent2D actualExtent = {static_cast<uint32_t>(width),
                                    static_cast<uint32_t>(height)};

@@ -2,8 +2,7 @@
 // Created by codewing on 20.04.2018.
 //
 
-#ifndef VULKAN_VOXEL_VERTEX_H
-#define VULKAN_VOXEL_VERTEX_H
+#pragma once
 
 #include <array>
 
@@ -45,5 +44,3 @@ struct Vertex {
         return attributeDescriptions;
     }
 };
-
-#endif //VULKAN_VOXEL_VERTEX_H

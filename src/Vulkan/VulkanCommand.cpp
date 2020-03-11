@@ -4,7 +4,7 @@
 
 #include <stdexcept>
 #include "VulkanCommand.h"
-#include "Utilities.h"
+#include "VulkanUtilities.h"
 
 void VulkanCommand::CreateCommandPool(VkDevice device, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
                                       QueueFamilyType queueFamilyType, VkCommandPool *commandPool) {

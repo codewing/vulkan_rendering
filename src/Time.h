@@ -2,9 +2,7 @@
 // Created by codewing on 04.05.2018.
 //
 
-#ifndef VULKAN_VOXEL_TIME_H
-#define VULKAN_VOXEL_TIME_H
-
+#pragma once
 
 #include <chrono>
 
@@ -22,6 +20,3 @@ public:
     float GetTimeSinceStart();
 
 };
-
-
-#endif //VULKAN_VOXEL_TIME_H

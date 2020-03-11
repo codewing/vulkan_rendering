@@ -5,7 +5,7 @@
 #include "VulkanImage.h"
 #include "../VulkanMemory.h"
 #include "../VulkanCommand.h"
-#include "../Utilities.h"
+#include "../VulkanUtilities.h"
 
 #include <stdexcept>
 

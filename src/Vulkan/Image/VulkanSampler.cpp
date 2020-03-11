@@ -3,7 +3,7 @@
 //
 
 #include "VulkanSampler.h"
-#include "../Utilities.h"
+#include "../VulkanUtilities.h"
 
 #include <stdexcept>
 

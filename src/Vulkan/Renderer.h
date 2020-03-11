@@ -8,7 +8,7 @@
 #include <vector>
 #include <memory>
 #include "SwapChainSupportDetails.h"
-#include "Scene.h"
+#include "../Scene.h"
 
 class Window;
 class QueueFamilyIndices;
@@ -19,7 +19,7 @@ class Renderer {
 
 public:
 
-    Renderer(std::shared_ptr<Scene> scene, int width, int height);
+    Renderer(std::shared_ptr<Scene> scene, std::shared_ptr<Window> window);
     ~Renderer();
 
     bool Run();

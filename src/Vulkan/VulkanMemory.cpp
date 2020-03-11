@@ -4,7 +4,7 @@
 
 #include <stdexcept>
 #include "VulkanMemory.h"
-#include "Utilities.h"
+#include "VulkanUtilities.h"
 
 uint32_t
 VulkanMemory::FindMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties) {

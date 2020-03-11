@@ -2,8 +2,7 @@
 // Created by codewing on 20.04.2018.
 //
 
-#ifndef VULKAN_VOXEL_SCENE_H
-#define VULKAN_VOXEL_SCENE_H
+#pragma once
 
 #include <vector>
 #include "Vertex.h"
@@ -26,6 +25,3 @@ public:
     UniformBufferObject& GetActiveCamera();
 
 };
-
-
-#endif //VULKAN_VOXEL_SCENE_H
