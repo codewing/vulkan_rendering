@@ -16,7 +16,8 @@ int main() {
         do {
             time->UpdateTime();
 
-            scene->UpdateCamera(time->GetTimeSinceStart());
+            float aspect = window->Width()/static_cast<float>(window->Height());
+            scene->UpdateCamera(time->GetTimeSinceStart(), aspect);
 
         } while (renderer->Run());
     } catch (const std::runtime_error &e) {

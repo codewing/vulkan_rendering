@@ -704,10 +704,7 @@ void Renderer::CreateVertexBuffer() {
                                             stagingBuffer, stagingBufferMemory);
 
     // map and copy the vertices to slow ram
-    void *data;
-    vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-    memcpy(data, scene->GetVertices().data(), static_cast<size_t>(bufferSize));
-    vkUnmapMemory(device, stagingBufferMemory);
+    VulkanMemory::CopyMemoryToGpu(device, stagingBufferMemory, scene->GetVertices().data(), static_cast<size_t>(bufferSize));
 
     VulkanMemory::CreateBufferAndBindMemory(device, physicalDevice, bufferSize,
                                             VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
@@ -734,10 +731,7 @@ void Renderer::CreateIndexBuffer() {
 
     VulkanMemory::CreateBufferAndBindMemory(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
-    void* data;
-    vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-    memcpy(data, scene->GetIndices().data(), static_cast<size_t>(bufferSize));
-    vkUnmapMemory(device, stagingBufferMemory);
+    VulkanMemory::CopyMemoryToGpu(device, stagingBufferMemory, scene->GetIndices().data(), static_cast<size_t>(bufferSize));
 
     VulkanMemory::CreateBufferAndBindMemory(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
 
@@ -765,12 +759,7 @@ void Renderer::CreateUniformBuffers() {
 }
 
 void Renderer::UpdateUniformBuffers(int currentImage) {
-    
-    void* data;
-    vkMapMemory(device, uniformBuffersMemory[currentImage], 0, sizeof(UniformBufferObject), 0, &data);
-    memcpy(data, &(scene->GetActiveCamera()), sizeof(UniformBufferObject));
-    vkUnmapMemory(device, uniformBuffersMemory[currentImage]);
-    
+    VulkanMemory::CopyMemoryToGpu(device, uniformBuffersMemory[currentImage], &(scene->GetActiveCamera()), sizeof(UniformBufferObject));   
 }
 
 void Renderer::DestroyUniformBuffers() {

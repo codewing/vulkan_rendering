@@ -38,6 +38,8 @@ bool GLFWWindow::Update() {
 
 void GLFWWindow::FramebufferResizedCB(GLFWwindow *window, int width, int height) {
     GLFWWindow *currentWindow = reinterpret_cast<GLFWWindow *>(glfwGetWindowUserPointer(window));
+    currentWindow->width = width;
+    currentWindow->height = height;
     currentWindow->OnResizedEvent();
 }
 

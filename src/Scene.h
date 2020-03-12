@@ -18,7 +18,7 @@ private:
 public:
     Scene();
 
-    void UpdateCamera(float DeltaTime);
+    void UpdateCamera(float deltaTime, float aspectRatio);
 
     std::vector<Vertex> GetVertices();
     std::vector<uint32_t> GetIndices();
