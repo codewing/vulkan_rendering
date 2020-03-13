@@ -8,4 +8,6 @@
 #include <vector>
 #include <string>
 
-std::vector<char> readFile(const std::string &filename);
+namespace Utilities {
+    std::vector<char> ReadFile(const std::string &filename);
+}

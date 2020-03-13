@@ -29,7 +29,9 @@ public:
     virtual bool Update() = 0;
     virtual bool CreateSurface(VkInstance instance, VkSurfaceKHR* surface) = 0;
 
-    const int Width() const { return width; };
-    const int Height() const { return height; };
+    [[nodiscard]]
+    int Width() const { return width; };
+    [[nodiscard]]
+    int Height() const { return height; };
 
 };

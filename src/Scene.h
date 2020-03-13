@@ -5,23 +5,27 @@
 #pragma once
 
 #include <vector>
-#include "Vertex.h"
-#include "UniformBufferObject.h"
+#include <memory>
+
+#include <glm/glm.hpp>
+
+class Mesh;
+class Renderer;
 
 class Scene {
 
 private:
-    std::vector<Vertex> vertices;
-    std::vector<uint32_t> indices;
-    UniformBufferObject activeCamera;
+    std::vector<std::shared_ptr<Mesh>> meshes;
+    std::shared_ptr<Renderer> renderer;
+
+    glm::mat4 view;
+    glm::mat4 proj;
 
 public:
-    Scene();
+    Scene(std::shared_ptr<Renderer> renderer);
+
+    void Setup();
+    void Teardown();
 
     void UpdateCamera(float deltaTime, float aspectRatio);
-
-    std::vector<Vertex> GetVertices();
-    std::vector<uint32_t> GetIndices();
-    UniformBufferObject& GetActiveCamera();
-
 };

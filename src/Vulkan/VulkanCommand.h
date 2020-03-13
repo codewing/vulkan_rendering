@@ -18,7 +18,7 @@ public:
 
 
     static void CopyBuffer(VkDevice device, VkCommandPool commandPool, VkBuffer srcBuffer,
-                           VkBuffer dstBuffer, VkDeviceSize size, VkQueue queue);
+                           VkBuffer dstBuffer, VkDeviceSize size, VkQueue queue, VkDeviceSize dstOffset = 0);
     static void TransitionImageLayout(VkDevice device, VkCommandPool commandPool, VkQueue queue,
                             VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
 

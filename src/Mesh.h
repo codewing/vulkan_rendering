@@ -8,9 +8,12 @@
 #include <vector>
 #include <memory>
 
+#include <vulkan/vulkan.h>
+
 #include "UniformBufferObject.h"
 
 class Image;
+class Renderer;
 struct Vertex;
 
 class Mesh {
@@ -18,9 +21,14 @@ class Mesh {
 private:
     std::vector<Vertex> vertices;
     std::vector<uint32_t> indices;
-    UniformBufferObject ubo;
+    std::vector<UniformBufferObject> ubos;
 
     std::shared_ptr<Image> texture;
+
+    VkBuffer buffer;
+    VkDeviceMemory bufferMemory;
+
+    std::shared_ptr<Renderer> renderer;
 
 public:
     explicit Mesh();
@@ -33,5 +41,14 @@ public:
 
     std::vector<Vertex>& GetVertices() { return vertices; };
     std::vector<uint32_t>& GetIndices() { return indices; };
-    UniformBufferObject& GetUBO() { return ubo; };
+    std::vector<UniformBufferObject>& GetUBO() { return ubos; };
+
+    void CreateBuffer();
+    void DestroyBuffer();
+
+    void CopyDataToGPU();
+
+    VkDeviceSize GetVertexBufferOffset();
+    VkDeviceSize GetIndexBufferOffset();
+    VkDeviceSize GetUniformBufferOffset(int swapchainIndex);
 };

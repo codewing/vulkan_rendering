@@ -9,6 +9,9 @@
 #include <memory>
 #include "SwapChainSupportDetails.h"
 #include "../Scene.h"
+#include "../Vertex.h"
+#include "../UniformBufferObject.h"
+#include "Pipeline/Pipeline.h"
 
 class Window;
 class QueueFamilyIndices;
@@ -19,7 +22,7 @@ class Renderer {
 
 public:
 
-    Renderer(std::shared_ptr<Scene> scene, std::shared_ptr<Window> window);
+    Renderer(std::shared_ptr<Window> window);
     ~Renderer();
 
     bool Run();
@@ -29,7 +32,6 @@ public:
 private:
     // Variables
     std::shared_ptr<Window> window;
-    std::shared_ptr<Scene> scene;
 
     VkInstance instance = VK_NULL_HANDLE;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
@@ -49,9 +51,8 @@ private:
     std::shared_ptr<VulkanImage> depthImage = nullptr;
 
     VkRenderPass renderPass;
-    VkDescriptorSetLayout descriptorSetLayout;
-    VkPipelineLayout pipelineLayout;
-    VkPipeline graphicsPipeline;
+    std::shared_ptr<Pipeline> graphicsPipeline;
+    std::shared_ptr<PipelineLayout> pipelineLayout;
 
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
@@ -68,6 +69,7 @@ private:
     std::vector<VkCommandBuffer> graphicCommandBuffers;
 
     VkDescriptorPool descriptorPool;
+    std::shared_ptr<DescriptorSetLayout> descriptorSetLayout;
     std::vector<VkDescriptorSet> descriptorSets;
 
     VkSemaphore imageAvailableSemaphore;
@@ -114,14 +116,19 @@ private:
     void CreateFramebuffers();
     void DestroyFramebuffers();
 
-    void CreateVertexBuffer();
+    void CreateMeshBuffer(VkDeviceSize size, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+    void DestroyBuffer(VkBuffer buffer, VkDeviceMemory bufferMemory);
+
+    void CopyDataToBuffer(void* data, VkDeviceSize dataSize, VkBuffer buffer, VkDeviceSize bufferOffset);
+
+    void CreateVertexBuffer(std::vector<Vertex>& vertices);
     void DestroyVertexBuffer();
 
-    void CreateIndexBuffer();
+    void CreateIndexBuffer(std::vector<uint32_t>& indices);
     void DestroyIndexBuffer();
 
     void CreateUniformBuffers();
-    void UpdateUniformBuffers(int currentImage);
+    void UpdateUniformBuffer(VkDeviceMemory uniformBufferMemory, UniformBufferObject& ubo, VkDeviceSize bufferOffset);
     void DestroyUniformBuffers();
 
     void CreateCommandPools();
@@ -166,6 +173,5 @@ private:
     void DestroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT callback,
                                        const VkAllocationCallbacks *pAllocator);
 
-    VkShaderModule CreateShaderModule(const std::vector<char> &code);
-
+    friend class Mesh;
 };

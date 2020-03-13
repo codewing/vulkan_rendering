@@ -13,19 +13,17 @@ class GLFWWindow : public Window {
 private:
     GLFWwindow *window = nullptr;
 
-    virtual void Initialize() override;
+    void Initialize() override;
 
-    virtual void CleanUp() override;
+    void CleanUp() override;
 
     static void FramebufferResizedCB(GLFWwindow *window, int width, int height);
 
 public:
     GLFWWindow(std::string name, int width, int height);
 
-    virtual ~GLFWWindow();
+    ~GLFWWindow() override;
 
-    virtual bool Update() override;
-    bool CreateSurface(VkInstance instance, VkSurfaceKHR* surface);
-
-    GLFWwindow *GetGLFWwindow();
+    bool Update() override;
+    bool CreateSurface(VkInstance instance, VkSurfaceKHR* surface) override;
 };

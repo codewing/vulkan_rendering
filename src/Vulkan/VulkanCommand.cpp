@@ -32,7 +32,7 @@ void VulkanCommand::CreateCommandPool(VkDevice device, VkPhysicalDevice physical
 }
 
 void VulkanCommand::CopyBuffer(VkDevice device, VkCommandPool commandPool, VkBuffer srcBuffer,
-                                                 VkBuffer dstBuffer, VkDeviceSize size, VkQueue queue) {
+                                                 VkBuffer dstBuffer, VkDeviceSize size, VkQueue queue, VkDeviceSize dstOffset) {
     VkCommandBuffer commandBuffer = BeginSingleTimeCommands(device, commandPool);
 
     // Create the copy command
