@@ -9,6 +9,8 @@
 #include "DescriptorSetLayoutBinding.h"
 
 
+class Renderer;
+
 class DescriptorSetLayout {
 
 public:
@@ -17,6 +19,8 @@ public:
 
     void Compile(VkDevice device);
     VkDescriptorSetLayout Handle() const;
+
+    std::vector<VkDescriptorPoolSize> GetDescriptorPoolSize();
 
     std::vector<DescriptorSetLayoutBinding> bindings;
 

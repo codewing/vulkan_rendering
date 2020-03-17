@@ -16,16 +16,17 @@ class Scene {
 
 private:
     std::vector<std::shared_ptr<Mesh>> meshes;
-    std::shared_ptr<Renderer> renderer;
 
     glm::mat4 view;
     glm::mat4 proj;
 
 public:
-    Scene(std::shared_ptr<Renderer> renderer);
+    Scene();
 
     void Setup();
     void Teardown();
 
     void UpdateCamera(float deltaTime, float aspectRatio);
+
+    std::vector<std::shared_ptr<Mesh>>& GetMeshes() { return meshes; };
 };

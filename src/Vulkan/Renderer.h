@@ -17,6 +17,8 @@ class Window;
 class QueueFamilyIndices;
 class VulkanImage;
 class VulkanSampler;
+class Image;
+class DescriptorPool;
 
 class Renderer {
 
@@ -25,6 +27,8 @@ public:
     Renderer(std::shared_ptr<Window> window);
     ~Renderer();
 
+    void SetupRenderer(std::shared_ptr<Scene> scene);
+
     bool Run();
 
     void RecreateSwapchain();
@@ -32,6 +36,7 @@ public:
 private:
     // Variables
     std::shared_ptr<Window> window;
+    std::shared_ptr<Scene> currentScene;
 
     VkInstance instance = VK_NULL_HANDLE;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
@@ -61,16 +66,9 @@ private:
     std::vector<VkBuffer> uniformBuffers;
     std::vector<VkDeviceMemory> uniformBuffersMemory;
 
-    std::shared_ptr<VulkanImage> texture = nullptr;
-    std::shared_ptr<VulkanSampler> sampler = nullptr;
-
     VkCommandPool graphicCommandPool;
     VkCommandPool transferCommandPool;
     std::vector<VkCommandBuffer> graphicCommandBuffers;
-
-    VkDescriptorPool descriptorPool;
-    std::shared_ptr<DescriptorSetLayout> descriptorSetLayout;
-    std::vector<VkDescriptorSet> descriptorSets;
 
     VkSemaphore imageAvailableSemaphore;
     VkSemaphore renderFinishedSemaphore;
@@ -107,9 +105,6 @@ private:
     void CreateRenderPass();
     void DestroyRenderPass();
 
-    void CreateDescriptorSetLayout();
-    void DestroyDescriptorSetLayout();
-
     void CreateGraphicsPipeline();
     void DestroyGraphicsPipeline();
 
@@ -136,9 +131,7 @@ private:
 
     void CreateCommandBuffers();
 
-    void CreateDescriptorPool();
-    void DestroyDescriptorPool();
-    void CreateDescriptorSets();
+    void CreateDescriptors(std::shared_ptr<DescriptorPool> descriptorPool, VkImageView imageView, VkSampler sampler);
 
     void DrawFrame();
 
@@ -150,8 +143,8 @@ private:
     void CreateDepthResources();
     void DestroyDepthResources();
 
-    void CreateTextureImage();
-    void CreateTextureSampler();
+    void CreateTextureImage(Image& img, std::shared_ptr<VulkanImage> vulkanTexture);
+    void CreateTextureSampler(std::shared_ptr<VulkanSampler> vulkanSampler);
 
     std::vector<const char *> GetRequiredExtensions();
     bool IsDeviceSuitable(VkPhysicalDevice vkPhysicalDevice);
@@ -173,5 +166,6 @@ private:
     void DestroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT callback,
                                        const VkAllocationCallbacks *pAllocator);
 
-    friend class Mesh;
+
+    friend class Mesh; friend class DescriptorSetLayout; friend class DescriptorPool;
 };

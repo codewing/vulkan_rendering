@@ -11,8 +11,10 @@
 
 #include "Mesh.h"
 #include "Vertex.h"
+#include "Image.h"
 
-Scene::Scene(std::shared_ptr<Renderer> renderer) : renderer(renderer) {}
+
+Scene::Scene() {}
 
 void Scene::Setup() {
     std::vector<Vertex> vertices = {
@@ -38,21 +40,18 @@ void Scene::Setup() {
     std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
     mesh->SetVertices(vertices);
     mesh->SetIndices(indices);
-    mesh->CreateBuffer();
-    mesh->CopyDataToGPU();
+    mesh->SetTexture(std::make_shared<Image>("assets/textures/statue.jpg"));
+    // TODO: needed?
+    //mesh->CreateBuffer();
+    //mesh->CopyDataToGPU();
     // bind ubo buffer
     // record mesh commands ((graphic)commandBuffer - bind vertex index buffer descSet)
 
     meshes.push_back(mesh);
-
-    // descriptor sets
-    // build command buffers
 }
 
 void Scene::Teardown() {
-    for(auto& mesh : meshes) {
-        mesh->DestroyBuffer();
-    }
+    
 }
 
 void Scene::UpdateCamera(float deltaSinceStart, float aspectRatio) {

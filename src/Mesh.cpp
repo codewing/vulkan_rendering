@@ -7,6 +7,10 @@
 #include "Vertex.h"
 #include "Image.h"
 #include "Vulkan/Renderer.h"
+#include "Vulkan/Image/VulkanImage.h"
+#include "Vulkan/Image/VulkanSampler.h"
+#include "Vulkan/Descriptor/DescriptorPool.h"
+
 
 Mesh::Mesh() {
 
@@ -28,22 +32,34 @@ void Mesh::SetTexture(std::shared_ptr<Image> image) {
     this->texture = image;
 }
 
-void Mesh::CreateBuffer() {
+void Mesh::CreateBuffers(Renderer& renderer) {
     VkDeviceSize bufferSize = sizeof(uint32_t) * indices.size()
                             + sizeof(Vertex) * vertices.size()
-                            + sizeof(UniformBufferObject) * renderer->swapchainImages.size();
+                            + sizeof(UniformBufferObject) * renderer.swapchainImages.size();
 
-    renderer->CreateMeshBuffer(bufferSize, buffer, bufferMemory);
+    renderer.CreateMeshBuffer(bufferSize, buffer, bufferMemory);
 }
 
-void Mesh::DestroyBuffer() {
-    renderer->DestroyBuffer(buffer, bufferMemory);
+void Mesh::DestroyBuffer(Renderer& renderer) {
+    renderer.DestroyBuffer(buffer, bufferMemory);
 }
 
-void Mesh::CopyDataToGPU() {
-    renderer->CopyDataToBuffer(vertices.data(), vertices.size(), buffer, GetVertexBufferOffset());
-    renderer->CopyDataToBuffer(indices.data(), indices.size(), buffer, GetIndexBufferOffset());
-    renderer->CopyDataToBuffer(ubos.data(), ubos.size(), buffer, GetUniformBufferOffset(0));
+void Mesh::CopyDataToGPU(Renderer& renderer) {
+    renderer.CopyDataToBuffer(vertices.data(), vertices.size(), buffer, GetVertexBufferOffset());
+    renderer.CopyDataToBuffer(indices.data(), indices.size(), buffer, GetIndexBufferOffset());
+    renderer.CopyDataToBuffer(ubos.data(), ubos.size(), buffer, GetUniformBufferOffset(0));
+}
+
+void Mesh::CreateTexture(Renderer& renderer) {
+    renderer.CreateTextureImage(*texture, vulkanTexture);
+}
+
+void Mesh::CreateSampler(Renderer& renderer) {
+    renderer.CreateTextureSampler(vulkanSampler);
+}
+
+void Mesh::CreateDescriptors(Renderer& renderer) {
+    renderer.CreateDescriptors(descriptorPool, vulkanTexture->GetImageView(), vulkanSampler->GetSampler());
 }
 
 VkDeviceSize Mesh::GetVertexBufferOffset() { 
@@ -57,3 +73,14 @@ VkDeviceSize Mesh::GetIndexBufferOffset() {
 VkDeviceSize Mesh::GetUniformBufferOffset(int swapchainIndex) { 
     return GetIndexBufferOffset() + sizeof(uint32_t) * indices.size() + sizeof(UniformBufferObject) * swapchainIndex; 
 };
+
+void Mesh::FreeMesh(Renderer& renderer) {
+    vulkanTexture->FreeImage();
+    vulkanSampler->FreeSampler();
+
+    DestroyBuffer(renderer);
+}
+
+VkDescriptorSet Mesh::GetDescriptorSet(uint32_t frame) { 
+    return descriptorPool->HandleToDescriptor(frame); 
+}

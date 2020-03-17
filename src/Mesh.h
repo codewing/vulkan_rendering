@@ -14,6 +14,9 @@
 
 class Image;
 class Renderer;
+class VulkanImage;
+class VulkanSampler;
+class DescriptorPool;
 struct Vertex;
 
 class Mesh {
@@ -28,12 +31,14 @@ private:
     VkBuffer buffer;
     VkDeviceMemory bufferMemory;
 
-    std::shared_ptr<Renderer> renderer;
+    std::shared_ptr<VulkanImage> vulkanTexture = nullptr;
+    std::shared_ptr<VulkanSampler> vulkanSampler = nullptr;
+
+    std::shared_ptr<DescriptorPool> descriptorPool = nullptr;
 
 public:
     explicit Mesh();
     virtual ~Mesh();
-
 
     void SetVertices(std::vector<Vertex> vertices);
     void SetIndices(std::vector<uint32_t> indices);
@@ -43,12 +48,21 @@ public:
     std::vector<uint32_t>& GetIndices() { return indices; };
     std::vector<UniformBufferObject>& GetUBO() { return ubos; };
 
-    void CreateBuffer();
-    void DestroyBuffer();
+    void CreateBuffers(Renderer& renderer);
+    void DestroyBuffer(Renderer& renderer);
+    void CopyDataToGPU(Renderer& renderer);
 
-    void CopyDataToGPU();
+    void CreateTexture(Renderer& renderer);
+    void CreateSampler(Renderer& renderer);
+
+    void CreateDescriptors(Renderer& renderer);
 
     VkDeviceSize GetVertexBufferOffset();
     VkDeviceSize GetIndexBufferOffset();
     VkDeviceSize GetUniformBufferOffset(int swapchainIndex);
+
+    VkBuffer GetBufferHandle() { return buffer; };
+    VkDescriptorSet GetDescriptorSet(uint32_t frame);
+
+    void FreeMesh(Renderer& renderer);
 };

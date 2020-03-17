@@ -5,6 +5,8 @@
 #include "DescriptorSetLayout.h"
 #include "../VulkanUtilities.h"
 
+#include "../Renderer.h"
+
 
 DescriptorSetLayout::DescriptorSetLayout(const std::vector<DescriptorSetLayoutBinding> &bindings) : bindings(
         bindings) {}
@@ -33,6 +35,21 @@ void DescriptorSetLayout::Compile(VkDevice device) {
 
 VkDescriptorSetLayout DescriptorSetLayout::Handle() const {
     return descriptorSetLayout;
+}
+
+std::vector<VkDescriptorPoolSize> DescriptorSetLayout::GetDescriptorPoolSize() {
+
+    std::vector<VkDescriptorPoolSize> poolSizes;
+
+    for(const auto& binding : bindings) {
+        VkDescriptorPoolSize descriptorPoolSize;
+        descriptorPoolSize.type = binding.descriptorType;
+        descriptorPoolSize.descriptorCount = binding.descriptorCount;
+
+        poolSizes.push_back(descriptorPoolSize);
+    }
+
+    return std::move(poolSizes);
 }
 
 DescriptorSetLayout::~DescriptorSetLayout() {
