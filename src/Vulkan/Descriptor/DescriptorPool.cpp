@@ -32,12 +32,16 @@ void DescriptorPool::Allocate(Renderer& renderer) {
     ErrorCheck(vkCreateDescriptorPool(device, &poolCreateInfo, nullptr, &descriptorPool));
 
     VkDescriptorSetLayout layoutHandle = descriptorLayout->Handle();
+    std::vector<VkDescriptorSetLayout> layouts;
+    for(int i = 0; i < renderer.swapchainImages.size(); i++) {
+        layouts.push_back(layoutHandle);
+    }
 
     VkDescriptorSetAllocateInfo allocInfo = {};
     allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     allocInfo.descriptorPool = descriptorPool;
-    allocInfo.descriptorSetCount = static_cast<uint32_t>(renderer.swapchainImages.size());
-    allocInfo.pSetLayouts = &layoutHandle;
+    allocInfo.descriptorSetCount = static_cast<uint32_t>(layouts.size());
+    allocInfo.pSetLayouts = layouts.data();
 
     descriptorSets.resize(renderer.swapchainImages.size());
 

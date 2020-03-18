@@ -60,7 +60,7 @@ void Mesh::CreateSampler(Renderer& renderer) {
 }
 
 void Mesh::CreateDescriptors(Renderer& renderer) {
-    renderer.CreateDescriptors(descriptorPool, descriptorSetLayout, vulkanTexture->GetImageView(), vulkanSampler->GetSampler());
+    renderer.CreateDescriptors(*this);
 }
 
 VkDeviceSize Mesh::GetVertexBufferOffset() { 

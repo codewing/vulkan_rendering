@@ -68,4 +68,6 @@ public:
     std::shared_ptr<DescriptorSetLayout> GetDescriptorSetLayout() { return descriptorSetLayout; };
 
     void FreeMesh(Renderer& renderer);
+
+    friend class Renderer;
 };

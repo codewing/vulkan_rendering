@@ -131,7 +131,7 @@ private:
 
     void CreateCommandBuffers();
 
-    void CreateDescriptors(std::shared_ptr<DescriptorPool>& descriptorPool, std::shared_ptr<DescriptorSetLayout>& descriptorSetLayout, VkImageView imageView, VkSampler sampler);
+    void CreateDescriptors(Mesh& mesh);
 
     void DrawFrame();
 

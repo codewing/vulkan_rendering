@@ -27,7 +27,6 @@ VkShaderModule ShaderModule::Compile(VkDevice device) {
     shaderModuleCreateInfo.codeSize = code.size();
     shaderModuleCreateInfo.pCode = reinterpret_cast<const uint32_t *>(code.data());
 
-    VkShaderModule shaderModule;
     ErrorCheck(vkCreateShaderModule(device, &shaderModuleCreateInfo, nullptr, &shaderModule));
 
     return shaderModule;

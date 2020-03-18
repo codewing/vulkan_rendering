@@ -470,6 +470,11 @@ void Renderer::CreateGraphicsPipeline(std::shared_ptr<DescriptorSetLayout> descr
 
     graphicsPipeline->scissors = { scissor };
 
+    RenderContext context = {};
+    context.device = device;
+    context.renderPass = renderPass;
+
+    graphicsPipeline->Compile(context);
 }
 
 void Renderer::DestroyGraphicsPipeline() {
@@ -936,7 +941,7 @@ bool Renderer::HasStencilComponent(VkFormat format) {
     return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
 }
 
-void Renderer::CreateDescriptors(std::shared_ptr<DescriptorPool>& descriptorPool, std::shared_ptr<DescriptorSetLayout>& descriptorSetLayout, VkImageView imageView, VkSampler sampler) {
+void Renderer::CreateDescriptors(Mesh& mesh) {
     auto count = static_cast<uint32_t>(swapchainImages.size());
     std::vector<DescriptorSetLayoutBinding> layoutBindings =
     {
@@ -944,29 +949,29 @@ void Renderer::CreateDescriptors(std::shared_ptr<DescriptorPool>& descriptorPool
             { 1, count, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT }
     };
 
-    descriptorSetLayout = std::make_shared<DescriptorSetLayout>(layoutBindings);
-    descriptorSetLayout->Compile(device);
+    mesh.descriptorSetLayout = std::make_shared<DescriptorSetLayout>(layoutBindings);
+    mesh.descriptorSetLayout->Compile(device);
 
-    descriptorPool = std::make_shared<DescriptorPool>(device);
-    descriptorPool->SetDescriptorLayout(descriptorSetLayout);
-    descriptorPool->Allocate(*this);
+    mesh.descriptorPool = std::make_shared<DescriptorPool>(device);
+    mesh.descriptorPool->SetDescriptorLayout(mesh.descriptorSetLayout);
+    mesh.descriptorPool->Allocate(*this);
 
     for(size_t i = 0; i < swapchainImages.size(); i++) {
         VkDescriptorBufferInfo bufferInfo = {};
-        bufferInfo.buffer = uniformBuffers[i];
-        bufferInfo.offset = 0;
+        bufferInfo.buffer = mesh.buffer;
+        bufferInfo.offset = mesh.GetUniformBufferOffset(i);
         bufferInfo.range = sizeof(UniformBufferObject);
 
         VkDescriptorImageInfo imageInfo = {};
         imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        imageInfo.imageView = imageView;
-        imageInfo.sampler = sampler;
+        imageInfo.imageView = mesh.vulkanTexture->GetImageView();
+        imageInfo.sampler = mesh.vulkanSampler->GetSampler();
 
 
         std::array<VkWriteDescriptorSet, 2> descriptorWrites = {};
 
         descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        descriptorWrites[0].dstSet = descriptorPool->HandleToDescriptor(i);
+        descriptorWrites[0].dstSet = mesh.descriptorPool->HandleToDescriptor(i);
         descriptorWrites[0].dstBinding = 0;
         descriptorWrites[0].dstArrayElement = 0;
         descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -974,7 +979,7 @@ void Renderer::CreateDescriptors(std::shared_ptr<DescriptorPool>& descriptorPool
         descriptorWrites[0].pBufferInfo = &bufferInfo;
 
         descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        descriptorWrites[1].dstSet = descriptorPool->HandleToDescriptor(i);
+        descriptorWrites[1].dstSet = mesh.descriptorPool->HandleToDescriptor(i);
         descriptorWrites[1].dstBinding = 1;
         descriptorWrites[1].dstArrayElement = 0;
         descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
