@@ -41,11 +41,6 @@ void Scene::Setup() {
     mesh->SetVertices(vertices);
     mesh->SetIndices(indices);
     mesh->SetTexture(std::make_shared<Image>("assets/textures/statue.jpg"));
-    // TODO: needed?
-    //mesh->CreateBuffer();
-    //mesh->CopyDataToGPU();
-    // bind ubo buffer
-    // record mesh commands ((graphic)commandBuffer - bind vertex index buffer descSet)
 
     meshes.push_back(mesh);
 }

@@ -4,8 +4,7 @@
 
 #include "DescriptorPool.h"
 
-#include "Renderer.h"
-
+#include "../Renderer.h"
 #include "../VulkanUtilities.h"
 
 
@@ -18,11 +17,10 @@ void DescriptorPool::FreeDescriptorPool() {
 }
 
 void DescriptorPool::SetDescriptorLayout(std::shared_ptr<DescriptorSetLayout> layout) {
-    
+    this->descriptorLayout = layout;
 }
 
-VkDescriptorSet DescriptorPool::Allocate(Renderer& renderer) {
-
+void DescriptorPool::Allocate(Renderer& renderer) {
     std::vector<VkDescriptorPoolSize> poolSizes = descriptorLayout->GetDescriptorPoolSize();
 
     VkDescriptorPoolCreateInfo poolCreateInfo {};

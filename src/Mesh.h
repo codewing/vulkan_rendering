@@ -17,6 +17,7 @@ class Renderer;
 class VulkanImage;
 class VulkanSampler;
 class DescriptorPool;
+class DescriptorSetLayout;
 struct Vertex;
 
 class Mesh {
@@ -35,6 +36,7 @@ private:
     std::shared_ptr<VulkanSampler> vulkanSampler = nullptr;
 
     std::shared_ptr<DescriptorPool> descriptorPool = nullptr;
+    std::shared_ptr<DescriptorSetLayout> descriptorSetLayout = nullptr;
 
 public:
     explicit Mesh();
@@ -63,6 +65,7 @@ public:
 
     VkBuffer GetBufferHandle() { return buffer; };
     VkDescriptorSet GetDescriptorSet(uint32_t frame);
+    std::shared_ptr<DescriptorSetLayout> GetDescriptorSetLayout() { return descriptorSetLayout; };
 
     void FreeMesh(Renderer& renderer);
 };

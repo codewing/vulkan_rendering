@@ -27,7 +27,7 @@ public:
     void FreeDescriptorPool();
 
     void SetDescriptorLayout(std::shared_ptr<DescriptorSetLayout> layout);
-    VkDescriptorSet Allocate(Renderer& renderer);
+    void Allocate(Renderer& renderer);
     void Deallocate();
 
     VkDescriptorPool Handle() { return descriptorPool; };

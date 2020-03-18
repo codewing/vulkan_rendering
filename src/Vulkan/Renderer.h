@@ -27,7 +27,7 @@ public:
     Renderer(std::shared_ptr<Window> window);
     ~Renderer();
 
-    void SetupRenderer(std::shared_ptr<Scene> scene);
+    void SetupScene(std::shared_ptr<Scene> scene);
 
     bool Run();
 
@@ -105,7 +105,7 @@ private:
     void CreateRenderPass();
     void DestroyRenderPass();
 
-    void CreateGraphicsPipeline();
+    void CreateGraphicsPipeline(std::shared_ptr<DescriptorSetLayout> descriptorSetLayout);
     void DestroyGraphicsPipeline();
 
     void CreateFramebuffers();
@@ -131,7 +131,7 @@ private:
 
     void CreateCommandBuffers();
 
-    void CreateDescriptors(std::shared_ptr<DescriptorPool> descriptorPool, VkImageView imageView, VkSampler sampler);
+    void CreateDescriptors(std::shared_ptr<DescriptorPool>& descriptorPool, std::shared_ptr<DescriptorSetLayout>& descriptorSetLayout, VkImageView imageView, VkSampler sampler);
 
     void DrawFrame();
 
@@ -143,8 +143,8 @@ private:
     void CreateDepthResources();
     void DestroyDepthResources();
 
-    void CreateTextureImage(Image& img, std::shared_ptr<VulkanImage> vulkanTexture);
-    void CreateTextureSampler(std::shared_ptr<VulkanSampler> vulkanSampler);
+    void CreateTextureImage(Image& img, std::shared_ptr<VulkanImage>& vulkanTexture);
+    void CreateTextureSampler(std::shared_ptr<VulkanSampler>& vulkanSampler);
 
     std::vector<const char *> GetRequiredExtensions();
     bool IsDeviceSuitable(VkPhysicalDevice vkPhysicalDevice);

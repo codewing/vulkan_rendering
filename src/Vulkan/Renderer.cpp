@@ -38,7 +38,7 @@ Renderer::~Renderer() {
     DeInitVulkan();
 }
 
-void Renderer::SetupRenderer(std::shared_ptr<Scene> scene) {
+void Renderer::SetupScene(std::shared_ptr<Scene> scene) {
     currentScene = scene;
 
     for (auto& mesh : currentScene->GetMeshes()) {
@@ -47,6 +47,8 @@ void Renderer::SetupRenderer(std::shared_ptr<Scene> scene) {
         mesh->CreateTexture(*this);
         mesh->CreateSampler(*this);
         mesh->CreateDescriptors(*this);
+
+        CreateGraphicsPipeline(mesh->GetDescriptorSetLayout());
     }
 
     CreateCommandBuffers();
@@ -62,8 +64,6 @@ void Renderer::InitVulkan() {
     CreateSwapchain();
     CreateImageViews();
     CreateRenderPass();
-    //CreateDescriptorSetLayout();
-    CreateGraphicsPipeline();
     CreateCommandPools();
     CreateDepthResources();
     CreateFramebuffers();
@@ -395,7 +395,7 @@ void Renderer::RecreateSwapchain() {
     CreateSwapchain();
     CreateImageViews();
     CreateRenderPass();
-    CreateGraphicsPipeline();
+    //CreateGraphicsPipeline();
     CreateDepthResources();
     CreateFramebuffers();
     CreateUniformBuffers();
@@ -439,7 +439,7 @@ void Renderer::DestroyImageViews() {
     }
 }
 
-void Renderer::CreateGraphicsPipeline() {
+void Renderer::CreateGraphicsPipeline(std::shared_ptr<DescriptorSetLayout> descriptorSetLayout) {
     pipelineLayout = std::make_shared<PipelineLayout>();
     pipelineLayout->descriptorSetLayouts.push_back(descriptorSetLayout);
 
@@ -469,6 +469,7 @@ void Renderer::CreateGraphicsPipeline() {
     scissor.extent = {static_cast<uint32_t>(window->Width()), static_cast<uint32_t>(window->Height())};
 
     graphicsPipeline->scissors = { scissor };
+
 }
 
 void Renderer::DestroyGraphicsPipeline() {
@@ -935,7 +936,7 @@ bool Renderer::HasStencilComponent(VkFormat format) {
     return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
 }
 
-void Renderer::CreateDescriptors(std::shared_ptr<DescriptorPool> descriptorPool, VkImageView imageView, VkSampler sampler) {
+void Renderer::CreateDescriptors(std::shared_ptr<DescriptorPool>& descriptorPool, std::shared_ptr<DescriptorSetLayout>& descriptorSetLayout, VkImageView imageView, VkSampler sampler) {
     auto count = static_cast<uint32_t>(swapchainImages.size());
     std::vector<DescriptorSetLayoutBinding> layoutBindings =
     {
@@ -943,7 +944,8 @@ void Renderer::CreateDescriptors(std::shared_ptr<DescriptorPool> descriptorPool,
             { 1, count, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT }
     };
 
-    std::shared_ptr<DescriptorSetLayout> descriptorSetLayout = std::make_shared<DescriptorSetLayout>(layoutBindings);
+    descriptorSetLayout = std::make_shared<DescriptorSetLayout>(layoutBindings);
+    descriptorSetLayout->Compile(device);
 
     descriptorPool = std::make_shared<DescriptorPool>(device);
     descriptorPool->SetDescriptorLayout(descriptorSetLayout);
@@ -983,7 +985,7 @@ void Renderer::CreateDescriptors(std::shared_ptr<DescriptorPool> descriptorPool,
     }
 }
 
-void Renderer::CreateTextureImage(Image& img, std::shared_ptr<VulkanImage> vulkanTexture) {
+void Renderer::CreateTextureImage(Image& img, std::shared_ptr<VulkanImage>& vulkanTexture) {
     // TODO remove Image img("assets/textures/statue.jpg");
 
     VkBuffer stagingBuffer;
@@ -1007,7 +1009,7 @@ void Renderer::CreateTextureImage(Image& img, std::shared_ptr<VulkanImage> vulka
     vulkanTexture->CreateImageView(VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
 }
 
-void Renderer::CreateTextureSampler(std::shared_ptr<VulkanSampler> vulkanSampler) {
+void Renderer::CreateTextureSampler(std::shared_ptr<VulkanSampler>& vulkanSampler) {
     vulkanSampler = std::make_shared<VulkanSampler>(device);
 }
 

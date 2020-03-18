@@ -14,7 +14,7 @@ int main() {
     
     try {
         scene->Setup();
-        renderer->SetupRenderer(scene);
+        renderer->SetupScene(scene);
         do {
             time->UpdateTime();
 

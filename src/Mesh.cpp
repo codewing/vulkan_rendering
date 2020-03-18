@@ -10,6 +10,7 @@
 #include "Vulkan/Image/VulkanImage.h"
 #include "Vulkan/Image/VulkanSampler.h"
 #include "Vulkan/Descriptor/DescriptorPool.h"
+#include "Vulkan/Descriptor/DescriptorSetLayout.h"
 
 
 Mesh::Mesh() {
@@ -59,7 +60,7 @@ void Mesh::CreateSampler(Renderer& renderer) {
 }
 
 void Mesh::CreateDescriptors(Renderer& renderer) {
-    renderer.CreateDescriptors(descriptorPool, vulkanTexture->GetImageView(), vulkanSampler->GetSampler());
+    renderer.CreateDescriptors(descriptorPool, descriptorSetLayout, vulkanTexture->GetImageView(), vulkanSampler->GetSampler());
 }
 
 VkDeviceSize Mesh::GetVertexBufferOffset() { 
