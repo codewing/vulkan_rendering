@@ -3,6 +3,7 @@
 //
 
 #include <stdexcept>
+#include <cstring>
 #include "VulkanMemory.h"
 #include "VulkanUtilities.h"
 
