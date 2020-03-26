@@ -54,6 +54,9 @@ void Mesh::CreateBuffers(Renderer& renderer) {
 
 void Mesh::DestroyBuffer(Renderer& renderer) {
     renderer.DestroyBuffer(buffer, bufferMemory);
+}
+
+void Mesh::DestroyUniformBuffers(Renderer &renderer) {
     renderer.DestroyBuffer(uboBuffer, uboBufferMemory);
 }
 
@@ -99,4 +102,8 @@ void Mesh::FreeMesh(Renderer& renderer) {
 
 VkDescriptorSet Mesh::GetDescriptorSet(uint32_t frame) { 
     return descriptorPool->HandleToDescriptor(frame); 
+}
+
+void Mesh::DestroyDescriptors(Renderer &renderer) {
+    descriptorPool->FreeDescriptorPool();
 }

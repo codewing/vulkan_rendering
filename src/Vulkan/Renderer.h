@@ -60,13 +60,6 @@ private:
     std::shared_ptr<Pipeline> graphicsPipeline;
     std::shared_ptr<PipelineLayout> pipelineLayout;
 
-    VkBuffer vertexBuffer;
-    VkDeviceMemory vertexBufferMemory;
-    VkBuffer indexBuffer;
-    VkDeviceMemory indexBufferMemory;
-    std::vector<VkBuffer> uniformBuffers;
-    std::vector<VkDeviceMemory> uniformBuffersMemory;
-
     VkCommandPool graphicCommandPool;
     VkCommandPool transferCommandPool;
     std::vector<VkCommandBuffer> graphicCommandBuffers;
@@ -117,16 +110,7 @@ private:
     void DestroyBuffer(VkBuffer buffer, VkDeviceMemory bufferMemory);
 
     void CopyDataToBuffer(void* data, VkDeviceSize dataSize, VkBuffer buffer, VkDeviceSize bufferOffset);
-
-    void CreateVertexBuffer(std::vector<Vertex>& vertices);
-    void DestroyVertexBuffer();
-
-    void CreateIndexBuffer(std::vector<uint32_t>& indices);
-    void DestroyIndexBuffer();
-
-    void CreateUniformBuffers();
     void UpdateUniformBuffer(VkDeviceMemory uniformBufferMemory, UniformBufferObject& ubo, VkDeviceSize bufferOffset);
-    void DestroyUniformBuffers();
 
     void CreateCommandPools();
     void DestroyCommandPools();

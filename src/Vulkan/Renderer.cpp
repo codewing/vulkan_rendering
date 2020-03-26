@@ -74,10 +74,10 @@ void Renderer::InitVulkan() {
 void Renderer::DeInitVulkan() {
     CleanupSwapchain();
 
-    //DestroyDescriptorSetLayout();
-
-    DestroyIndexBuffer();
-    DestroyVertexBuffer();
+    for(auto& mesh : currentScene->GetMeshes()) {
+        mesh->DestroyBuffer(*this);
+        mesh->DestroyUniformBuffers(*this);
+    }
 
     DestroySemaphores();
     DestroyCommandPools();
@@ -417,8 +417,11 @@ void Renderer::CleanupSwapchain() {
     DestroyRenderPass();
     DestroyImageViews();
     DestroySwapchain();
-    DestroyUniformBuffers();
-    //DestroyDescriptorPool();
+
+    for(auto& mesh : currentScene->GetMeshes()) {
+        mesh->DestroyUniformBuffers(*this);
+        mesh->DestroyDescriptors(*this);
+    }
 }
 
 void Renderer::GetSwapchainImages() {
@@ -585,70 +588,6 @@ void Renderer::CreateCommandPools() {
                                      &transferCommandPool);
 }
 
-void Renderer::CreateVertexBuffer(std::vector<Vertex>& vertices) {
-    VkDeviceSize bufferSize = sizeof(Vertex) * vertices.size();
-
-    VkBuffer stagingBuffer;
-    VkDeviceMemory stagingBufferMemory;
-    VulkanMemory::CreateBufferAndBindMemory(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                                            stagingBuffer, stagingBufferMemory);
-
-    // map and copy the vertices to slow ram
-    VulkanMemory::CopyMemoryToGpu(device, stagingBufferMemory, vertices.data(), static_cast<size_t>(bufferSize));
-
-    VulkanMemory::CreateBufferAndBindMemory(device, physicalDevice, bufferSize,
-                                            VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                                            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
-
-    // copy vertices from slow ram to fast ram
-    VulkanCommand::CopyBuffer(device, transferCommandPool, stagingBuffer, vertexBuffer, bufferSize, transferQueue);
-
-    // cleanup
-    vkDestroyBuffer(device, stagingBuffer, nullptr);
-    vkFreeMemory(device, stagingBufferMemory, nullptr);
-}
-
-void Renderer::DestroyVertexBuffer() {
-    vkDestroyBuffer(device, vertexBuffer, nullptr);
-    vkFreeMemory(device, vertexBufferMemory, nullptr);
-}
-
-void Renderer::CreateIndexBuffer(std::vector<uint32_t>& indices) {
-    VkDeviceSize bufferSize = sizeof(uint32_t) * indices.size();
-
-    VkBuffer stagingBuffer;
-    VkDeviceMemory stagingBufferMemory;
-
-    VulkanMemory::CreateBufferAndBindMemory(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
-
-    VulkanMemory::CopyMemoryToGpu(device, stagingBufferMemory, indices.data(), static_cast<size_t>(bufferSize));
-
-    VulkanMemory::CreateBufferAndBindMemory(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
-
-    VulkanCommand::CopyBuffer(device, transferCommandPool, stagingBuffer, indexBuffer, bufferSize, transferQueue);
-
-    vkDestroyBuffer(device, stagingBuffer, nullptr);
-    vkFreeMemory(device, stagingBufferMemory, nullptr);
-}
-
-void Renderer::DestroyIndexBuffer() {
-    vkDestroyBuffer(device, indexBuffer, nullptr);
-    vkFreeMemory(device, indexBufferMemory, nullptr);
-}
-
-
-void Renderer::CreateUniformBuffers() {
-    VkDeviceSize bufferSize = sizeof(UniformBufferObject);
-
-    uniformBuffers.resize(swapchainImages.size());
-    uniformBuffersMemory.resize(swapchainImages.size());
-
-    for(size_t i = 0; i < swapchainImages.size(); i++) {
-        VulkanMemory::CreateBufferAndBindMemory(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i], uniformBuffersMemory[i]);
-    }
-}
-
 void Renderer::CreateMeshBuffer(VkDeviceSize size, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
     VulkanMemory::CreateBufferAndBindMemory(device, physicalDevice, size, 
                                             VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
@@ -684,13 +623,6 @@ void Renderer::DestroyBuffer(VkBuffer buffer, VkDeviceMemory bufferMemory) {
 
 void Renderer::UpdateUniformBuffer(VkDeviceMemory uniformBufferMemory, UniformBufferObject& ubo, VkDeviceSize bufferOffset) {
     VulkanMemory::CopyMemoryToGpu(device, uniformBufferMemory, &ubo, sizeof(UniformBufferObject), bufferOffset);
-}
-
-void Renderer::DestroyUniformBuffers() {
-    for (size_t i = 0; i < swapchainImages.size(); i++) {
-        vkDestroyBuffer(device, uniformBuffers[i], nullptr);
-        vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
-    }
 }
 
 void Renderer::CreateCommandBuffers() {

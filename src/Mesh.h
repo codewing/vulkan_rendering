@@ -60,6 +60,7 @@ public:
 
     void CreateBuffers(Renderer& renderer);
     void DestroyBuffer(Renderer& renderer);
+    void DestroyUniformBuffers(Renderer& renderer);
     void CopyDataToGPU(Renderer& renderer);
     void UpdateUniformBuffer(Renderer& renderer, uint32_t imageIndex);
 
@@ -67,6 +68,7 @@ public:
     void CreateSampler(Renderer& renderer);
 
     void CreateDescriptors(Renderer& renderer);
+    void DestroyDescriptors(Renderer& renderer);
 
     VkDeviceSize GetVertexBufferOffset();
     VkDeviceSize GetIndexBufferOffset();
