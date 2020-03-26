@@ -33,6 +33,9 @@ private:
     VkBuffer buffer;
     VkDeviceMemory bufferMemory;
 
+    VkBuffer uboBuffer;
+    VkDeviceMemory uboBufferMemory;
+
     VkDeviceSize vertexBufferOffset = 0;
     VkDeviceSize indexBufferOffset = 0;
     std::vector<VkDeviceSize> uniformBufferOffsets;
@@ -58,6 +61,7 @@ public:
     void CreateBuffers(Renderer& renderer);
     void DestroyBuffer(Renderer& renderer);
     void CopyDataToGPU(Renderer& renderer);
+    void UpdateUniformBuffer(Renderer& renderer, uint32_t imageIndex);
 
     void CreateTexture(Renderer& renderer);
     void CreateSampler(Renderer& renderer);

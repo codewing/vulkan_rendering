@@ -36,27 +36,34 @@ void Mesh::SetTexture(std::shared_ptr<Image> image) {
 void Mesh::CreateBuffers(Renderer& renderer) {
     vertexBufferOffset = 0;
     indexBufferOffset = sizeof(Vertex) * vertices.size();
+
+    renderer.CreateMeshBuffer(indexBufferOffset * sizeof(uint32_t) * indices.size(), buffer, bufferMemory);
+
     uniformBufferOffsets.resize(renderer.swapchainImages.size());
 
     double uniformOffsetAlignment = renderer.physicalDeviceProperties.limits.minUniformBufferOffsetAlignment;
-    VkDeviceSize currentOffset = indexBufferOffset + sizeof(uint32_t) * indices.size();
+    VkDeviceSize currentOffset = 0;
     for(int i = 0; i < uniformBufferOffsets.size(); i++) {
         auto num = std::ceil(currentOffset/uniformOffsetAlignment);
         uniformBufferOffsets[i] = num * uniformOffsetAlignment;
         currentOffset = uniformBufferOffsets[i] + sizeof(UniformBufferObject);
     }
-
-    renderer.CreateMeshBuffer(currentOffset, buffer, bufferMemory);
+    renderer.CreateUBOBuffer(currentOffset, uboBuffer, uboBufferMemory);
+    ubos.resize(renderer.swapchainImages.size());
 }
 
 void Mesh::DestroyBuffer(Renderer& renderer) {
     renderer.DestroyBuffer(buffer, bufferMemory);
+    renderer.DestroyBuffer(uboBuffer, uboBufferMemory);
 }
 
 void Mesh::CopyDataToGPU(Renderer& renderer) {
-    renderer.CopyDataToBuffer(vertices.data(), vertices.size(), buffer, GetVertexBufferOffset());
-    renderer.CopyDataToBuffer(indices.data(), indices.size(), buffer, GetIndexBufferOffset());
-    renderer.CopyDataToBuffer(ubos.data(), ubos.size(), buffer, GetUniformBufferOffset(0));
+    renderer.CopyDataToBuffer(vertices.data(), vertices.size() * sizeof(Vertex), buffer, vertexBufferOffset);
+    renderer.CopyDataToBuffer(indices.data(), indices.size() * sizeof(uint32_t), buffer, indexBufferOffset);
+}
+
+void Mesh::UpdateUniformBuffer(Renderer& renderer, uint32_t imageIndex) {
+    renderer.UpdateUniformBuffer(uboBufferMemory, ubos[imageIndex], uniformBufferOffsets[imageIndex]);
 }
 
 void Mesh::CreateTexture(Renderer& renderer) {

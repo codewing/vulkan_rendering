@@ -48,6 +48,8 @@ void Renderer::SetupScene(std::shared_ptr<Scene> scene) {
         mesh->CreateSampler(*this);
         mesh->CreateDescriptors(*this);
 
+        mesh->CopyDataToGPU(*this);
+
         CreateGraphicsPipeline(mesh->GetDescriptorSetLayout());
     }
 
@@ -399,7 +401,7 @@ void Renderer::RecreateSwapchain() {
     //CreateGraphicsPipeline();
     CreateDepthResources();
     CreateFramebuffers();
-    CreateUniformBuffers();
+    // unused handled in meshCreateUniformBuffers();
     //CreateDescriptorPool();
     //CreateDescriptorSets();
     CreateCommandBuffers();
@@ -649,8 +651,14 @@ void Renderer::CreateUniformBuffers() {
 
 void Renderer::CreateMeshBuffer(VkDeviceSize size, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
     VulkanMemory::CreateBufferAndBindMemory(device, physicalDevice, size, 
-                                            VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                                            VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
                                             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                                            buffer, bufferMemory);
+}
+
+void Renderer::CreateUBOBuffer(VkDeviceSize size, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
+    VulkanMemory::CreateBufferAndBindMemory(device, physicalDevice, size,VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                                             buffer, bufferMemory);
 }
 
@@ -762,7 +770,9 @@ void Renderer::DrawFrame() {
         ErrorCheck(result);
     }
 
-    // TODO UpdateUniformBuffers(imageIndex);
+    for(auto& mesh : currentScene->GetMeshes()) {
+        mesh->UpdateUniformBuffer(*this, imageIndex);
+    }
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -958,7 +968,7 @@ void Renderer::CreateDescriptors(Mesh& mesh) {
 
     for(size_t i = 0; i < swapchainImages.size(); i++) {
         VkDescriptorBufferInfo bufferInfo = {};
-        bufferInfo.buffer = mesh.buffer;
+        bufferInfo.buffer = mesh.uboBuffer;
         bufferInfo.offset = mesh.GetUniformBufferOffset(i);
         bufferInfo.range = sizeof(UniformBufferObject);
 

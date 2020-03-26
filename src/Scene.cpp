@@ -45,13 +45,23 @@ void Scene::Setup() {
     meshes.push_back(mesh);
 }
 
-void Scene::Teardown() {
-    
+void Scene::Teardown(Renderer& renderer) {
+    for(auto& mesh : meshes) {
+        mesh->FreeMesh(renderer);
+    }
 }
 
 void Scene::UpdateCamera(float deltaSinceStart, float aspectRatio) {
-    // TODO: move to model activeCamera.model = glm::rotate(glm::mat4(1.0f), deltaSinceStart * glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
     view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     proj = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 10.0f);
     proj[1][1] *= -1; // flip the image
+    for(auto& mesh : meshes) {
+        // TODO: move to model activeCamera.model = glm::rotate(glm::mat4(1.0f), deltaSinceStart * glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        for(auto& ubo : mesh->GetUBO()) {
+            ubo.model = glm::rotate(glm::mat4(1.0f), deltaSinceStart * glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+            ubo.view = view;
+            ubo.proj = proj;
+        }
+    }
 }

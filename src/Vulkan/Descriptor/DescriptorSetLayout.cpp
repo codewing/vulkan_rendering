@@ -31,6 +31,8 @@ VkDescriptorSetLayout DescriptorSetLayout::Compile(VkDevice device) {
     layoutInfo.pBindings = setLayoutBindings.data();
 
     ErrorCheck(vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayout));
+
+    return descriptorSetLayout;
 }
 
 VkDescriptorSetLayout DescriptorSetLayout::Handle() const {

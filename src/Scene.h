@@ -24,7 +24,7 @@ public:
     Scene();
 
     void Setup();
-    void Teardown();
+    void Teardown(Renderer& renderer);
 
     void UpdateCamera(float deltaTime, float aspectRatio);
 

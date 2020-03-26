@@ -113,6 +113,7 @@ private:
     void DestroyFramebuffers();
 
     void CreateMeshBuffer(VkDeviceSize size, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+    void CreateUBOBuffer(VkDeviceSize size, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
     void DestroyBuffer(VkBuffer buffer, VkDeviceMemory bufferMemory);
 
     void CopyDataToBuffer(void* data, VkDeviceSize dataSize, VkBuffer buffer, VkDeviceSize bufferOffset);
