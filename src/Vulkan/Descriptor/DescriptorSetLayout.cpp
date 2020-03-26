@@ -8,7 +8,7 @@
 #include "../Renderer.h"
 
 
-DescriptorSetLayout::DescriptorSetLayout(const std::vector<DescriptorSetLayoutBinding> &bindings) : bindings(
+DescriptorSetLayout::DescriptorSetLayout(const std::vector<DescriptorSetLayoutBinding>& bindings) : bindings(
         bindings) {}
 
 void DescriptorSetLayout::Compile(VkDevice device) {
@@ -37,14 +37,14 @@ VkDescriptorSetLayout DescriptorSetLayout::Handle() const {
     return descriptorSetLayout;
 }
 
-std::vector<VkDescriptorPoolSize> DescriptorSetLayout::GetDescriptorPoolSize() {
+std::vector<VkDescriptorPoolSize> DescriptorSetLayout::GetDescriptorPoolSize(uint32_t poolSize) {
 
     std::vector<VkDescriptorPoolSize> poolSizes;
 
     for(const auto& binding : bindings) {
         VkDescriptorPoolSize descriptorPoolSize;
         descriptorPoolSize.type = binding.descriptorType;
-        descriptorPoolSize.descriptorCount = binding.descriptorCount;
+        descriptorPoolSize.descriptorCount = binding.descriptorCount * poolSize;
 
         poolSizes.push_back(descriptorPoolSize);
     }

@@ -234,6 +234,7 @@ void Renderer::SetupPhysicalDevice() {
     for (const auto &device : devices) {
         if (IsDeviceSuitable(device)) {
             physicalDevice = device;
+            vkGetPhysicalDeviceProperties(physicalDevice, &physicalDeviceProperties);
             break;
         }
     }
@@ -942,11 +943,10 @@ bool Renderer::HasStencilComponent(VkFormat format) {
 }
 
 void Renderer::CreateDescriptors(Mesh& mesh) {
-    auto count = static_cast<uint32_t>(swapchainImages.size());
     std::vector<DescriptorSetLayoutBinding> layoutBindings =
     {
-            { 0, count, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT },
-            { 1, count, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT }
+            { 0, 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT },
+            { 1, 1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT }
     };
 
     mesh.descriptorSetLayout = std::make_shared<DescriptorSetLayout>(layoutBindings);

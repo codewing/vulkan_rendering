@@ -29,8 +29,13 @@ private:
 
     std::shared_ptr<Image> texture;
 
+    // internal values
     VkBuffer buffer;
     VkDeviceMemory bufferMemory;
+
+    VkDeviceSize vertexBufferOffset = 0;
+    VkDeviceSize indexBufferOffset = 0;
+    std::vector<VkDeviceSize> uniformBufferOffsets;
 
     std::shared_ptr<VulkanImage> vulkanTexture = nullptr;
     std::shared_ptr<VulkanSampler> vulkanSampler = nullptr;

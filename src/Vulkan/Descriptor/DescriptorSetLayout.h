@@ -20,7 +20,7 @@ public:
     void Compile(VkDevice device);
     VkDescriptorSetLayout Handle() const;
 
-    std::vector<VkDescriptorPoolSize> GetDescriptorPoolSize();
+    std::vector<VkDescriptorPoolSize> GetDescriptorPoolSize(uint32_t poolSize);
 
     std::vector<DescriptorSetLayoutBinding> bindings;
 

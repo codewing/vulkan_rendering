@@ -21,7 +21,7 @@ void DescriptorPool::SetDescriptorLayout(std::shared_ptr<DescriptorSetLayout> la
 }
 
 void DescriptorPool::Allocate(Renderer& renderer) {
-    std::vector<VkDescriptorPoolSize> poolSizes = descriptorLayout->GetDescriptorPoolSize();
+    std::vector<VkDescriptorPoolSize> poolSizes = descriptorLayout->GetDescriptorPoolSize(renderer.swapchainImages.size());
 
     VkDescriptorPoolCreateInfo poolCreateInfo {};
     poolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;

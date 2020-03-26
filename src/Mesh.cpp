@@ -34,11 +34,19 @@ void Mesh::SetTexture(std::shared_ptr<Image> image) {
 }
 
 void Mesh::CreateBuffers(Renderer& renderer) {
-    VkDeviceSize bufferSize = sizeof(uint32_t) * indices.size()
-                            + sizeof(Vertex) * vertices.size()
-                            + sizeof(UniformBufferObject) * renderer.swapchainImages.size();
+    vertexBufferOffset = 0;
+    indexBufferOffset = sizeof(Vertex) * vertices.size();
+    uniformBufferOffsets.resize(renderer.swapchainImages.size());
 
-    renderer.CreateMeshBuffer(bufferSize, buffer, bufferMemory);
+    double uniformOffsetAlignment = renderer.physicalDeviceProperties.limits.minUniformBufferOffsetAlignment;
+    VkDeviceSize currentOffset = indexBufferOffset + sizeof(uint32_t) * indices.size();
+    for(int i = 0; i < uniformBufferOffsets.size(); i++) {
+        auto num = std::ceil(currentOffset/uniformOffsetAlignment);
+        uniformBufferOffsets[i] = num * uniformOffsetAlignment;
+        currentOffset = uniformBufferOffsets[i] + sizeof(UniformBufferObject);
+    }
+
+    renderer.CreateMeshBuffer(currentOffset, buffer, bufferMemory);
 }
 
 void Mesh::DestroyBuffer(Renderer& renderer) {
@@ -64,15 +72,15 @@ void Mesh::CreateDescriptors(Renderer& renderer) {
 }
 
 VkDeviceSize Mesh::GetVertexBufferOffset() { 
-    return 0; 
+    return vertexBufferOffset;
 }
 
 VkDeviceSize Mesh::GetIndexBufferOffset() { 
-    return sizeof(Vertex) * vertices.size(); 
+    return indexBufferOffset;
 };
 
-VkDeviceSize Mesh::GetUniformBufferOffset(int swapchainIndex) { 
-    return GetIndexBufferOffset() + sizeof(uint32_t) * indices.size() + sizeof(UniformBufferObject) * swapchainIndex; 
+VkDeviceSize Mesh::GetUniformBufferOffset(int swapchainIndex) {
+    return uniformBufferOffsets[swapchainIndex];
 };
 
 void Mesh::FreeMesh(Renderer& renderer) {
