@@ -11,7 +11,7 @@
 DescriptorSetLayout::DescriptorSetLayout(const std::vector<DescriptorSetLayoutBinding>& bindings) : bindings(
         bindings) {}
 
-void DescriptorSetLayout::Compile(VkDevice device) {
+VkDescriptorSetLayout DescriptorSetLayout::Compile(VkDevice device) {
     this->device = device;
 
     std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings;

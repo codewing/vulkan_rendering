@@ -17,7 +17,7 @@ public:
     DescriptorSetLayout(const std::vector<DescriptorSetLayoutBinding> &bindings);
     ~DescriptorSetLayout();
 
-    void Compile(VkDevice device);
+    VkDescriptorSetLayout Compile(VkDevice device);
     VkDescriptorSetLayout Handle() const;
 
     std::vector<VkDescriptorPoolSize> GetDescriptorPoolSize(uint32_t poolSize);

@@ -228,12 +228,12 @@ void Renderer::SetupPhysicalDevice() {
         throw std::runtime_error("failed to find GPUs with Vulkan support!");
     }
 
-    std::vector<VkPhysicalDevice> devices(deviceCount);
-    vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+    std::vector<VkPhysicalDevice> physicalDevices(deviceCount);
+    vkEnumeratePhysicalDevices(instance, &deviceCount, physicalDevices.data());
 
-    for (const auto &device : devices) {
-        if (IsDeviceSuitable(device)) {
-            physicalDevice = device;
+    for (const auto &currentPhysical : physicalDevices) {
+        if (IsDeviceSuitable(currentPhysical)) {
+            physicalDevice = currentPhysical;
             vkGetPhysicalDeviceProperties(physicalDevice, &physicalDeviceProperties);
             break;
         }
@@ -450,7 +450,7 @@ void Renderer::CreateGraphicsPipeline(std::shared_ptr<DescriptorSetLayout> descr
     std::shared_ptr<ShaderModule> fragmentShaderModule = std::make_shared<ShaderModule>("assets/shaders/shader.frag.spv");
 
     graphicsPipeline->shaderStages =  {
-            {VK_SHADER_STAGE_VERTEX_BIT, fragmentShaderModule},
+            {VK_SHADER_STAGE_VERTEX_BIT, vertexShaderModule},
             {VK_SHADER_STAGE_FRAGMENT_BIT, fragmentShaderModule}
     };
 

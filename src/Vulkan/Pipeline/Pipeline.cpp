@@ -155,7 +155,7 @@ void PipelineLayout::Compile(VkDevice device) {
     this->device = device;
 
     for(const auto& dsl : descriptorSetLayouts) {
-        dsl->Compile(device);
+        compiledDescriptorSetLayouts.push_back(dsl->Compile(device));
     }
 
     VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
