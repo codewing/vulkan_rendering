@@ -77,9 +77,9 @@ void VulkanMemory::AllocateMemoryImage(const VkDevice &device, const VkPhysicalD
     vkBindImageMemory(device, image, *imageMemory, 0);
 }
 
-void VulkanMemory::CopyMemoryToGpu(VkDevice device, VkDeviceMemory deviceMemory, void* data, size_t size, VkDeviceSize offset) {
+void VulkanMemory::CopyMemoryToGpu(VkDevice device, VkDeviceMemory deviceMemory, void* data, VkDeviceSize size, VkDeviceSize offset) {
     void* gpuMemory;
     vkMapMemory(device, deviceMemory, offset, size, 0, &gpuMemory);
-    memcpy(gpuMemory, data, size);
+    memcpy(gpuMemory, data, static_cast<size_t>(size));
     vkUnmapMemory(device, deviceMemory);
 }

@@ -576,8 +576,8 @@ void Renderer::CreateFramebuffers() {
 }
 
 void Renderer::DestroyFramebuffers() {
-    for (auto framebuffer : swapchainFramebuffers) {
-        vkDestroyFramebuffer(device, framebuffer, nullptr);
+    for (auto frameBuffer : swapchainFramebuffers) {
+        vkDestroyFramebuffer(device, frameBuffer, nullptr);
     }
 }
 

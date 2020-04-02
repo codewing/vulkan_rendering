@@ -38,7 +38,7 @@ void VulkanCommand::CopyBuffer(VkDevice device, VkCommandPool commandPool, VkBuf
     // Create the copy command
     VkBufferCopy copyRegion{};
     copyRegion.srcOffset = 0;
-    copyRegion.dstOffset = 0;
+    copyRegion.dstOffset = dstOffset;
     copyRegion.size = size;
     vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 

@@ -10,7 +10,6 @@
 #include "Vulkan/Image/VulkanImage.h"
 #include "Vulkan/Image/VulkanSampler.h"
 #include "Vulkan/Descriptor/DescriptorPool.h"
-#include "Vulkan/Descriptor/DescriptorSetLayout.h"
 
 
 Mesh::Mesh() {
@@ -21,23 +20,23 @@ Mesh::~Mesh() {
 
 }
 
-void Mesh::SetVertices(std::vector<Vertex> vertices) {
-    this->vertices = vertices;
+void Mesh::SetVertices(std::vector<Vertex> newVertices) {
+    this->vertices = std::move(newVertices);
 }
 
-void Mesh::SetIndices(std::vector<uint32_t> indices) {
-    this->indices = indices;
+void Mesh::SetIndices(std::vector<uint32_t> newIndices) {
+    this->indices = std::move(newIndices);
 }
 
-void Mesh::SetTexture(std::shared_ptr<Image> image) {
-    this->texture = image;
+void Mesh::SetTexture(std::shared_ptr<Image> newImage) {
+    this->texture = std::move(newImage);
 }
 
 void Mesh::CreateBuffers(Renderer& renderer) {
     vertexBufferOffset = 0;
     indexBufferOffset = sizeof(Vertex) * vertices.size();
 
-    renderer.CreateMeshBuffer(indexBufferOffset * sizeof(uint32_t) * indices.size(), buffer, bufferMemory);
+    renderer.CreateMeshBuffer(indexBufferOffset + sizeof(uint32_t) * indices.size(), buffer, bufferMemory);
 
     uniformBufferOffsets.resize(renderer.swapchainImages.size());
 
