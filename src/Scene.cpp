@@ -12,37 +12,50 @@
 #include "Mesh.h"
 #include "Vertex.h"
 #include "Image.h"
+#include "MeshImporter.h"
 
 
 Scene::Scene() {}
 
 void Scene::Setup() {
-    std::vector<Vertex> vertices = {
-            {{-0.5f,  -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-            {{0.5f,  -0.5f, 0.0f},  {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-            {{0.5f, 0.5f, 0.0f},  {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-            {{-0.5f, 0.5f, 0.0f},  {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
 
-            {{-0.5f,  -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-            {{0.5f,  -0.5f, -0.5f},  {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-            {{0.5f, 0.5f, -0.5f},  {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-            {{-0.5f, 0.5f, -0.5f},  {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
-    };
+    {   // Two textured quads
+        std::vector<Vertex> vertices = {
+                {{-0.5f,  -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+                {{0.5f,  -0.5f, 0.0f},  {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+                {{0.5f, 0.5f, 0.0f},  {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+                {{-0.5f, 0.5f, 0.0f},  {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
 
-    std::vector<uint32_t> indices = {
-            0, 1, 2,
-            2, 3, 0,
+                {{-0.5f,  -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+                {{0.5f,  -0.5f, -0.5f},  {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+                {{0.5f, 0.5f, -0.5f},  {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+                {{-0.5f, 0.5f, -0.5f},  {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
+        };
 
-            4, 5, 6,
-            6, 7, 4
-    };
+        std::vector<uint32_t> indices = {
+                0, 1, 2,
+                2, 3, 0,
 
-    std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
-    mesh->SetVertices(vertices);
-    mesh->SetIndices(indices);
-    mesh->SetTexture(std::make_shared<Image>("assets/textures/statue.jpg"));
+                4, 5, 6,
+                6, 7, 4
+        };
 
-    meshes.push_back(mesh);
+        std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
+        mesh->SetVertices(vertices);
+        mesh->SetIndices(indices);
+        mesh->SetTexture(std::make_shared<Image>("assets/textures/statue.jpg"));
+
+        meshes.push_back(mesh);
+    }
+
+
+    {   // load house model - https://vulkan-tutorial.com/Loading_models
+        std::shared_ptr<Mesh> mesh = MeshImporter::LoadObjModel("assets/models/chalet.obj", "assets/textures/chalet.jpg");
+
+        meshes.push_back(mesh);
+    }
+
+
 }
 
 void Scene::Teardown(Renderer& renderer) {

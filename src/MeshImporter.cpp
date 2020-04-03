@@ -8,6 +8,7 @@
 #include <tiny_obj_loader.h>
 
 #include <iostream>
+#include <unordered_map>
 
 #include "Vertex.h"
 #include "Mesh.h"
@@ -38,6 +39,7 @@ void MeshImporter::LoadObjMesh(const std::string& objPath, Mesh& mesh) {
     }
 
     std::vector<Vertex> vertices;
+    std::unordered_map<Vertex, uint32_t> uniqueVertices = {};
     std::vector<uint32_t> indices;
 
     for(const auto& shape : shapes) {
@@ -51,13 +53,18 @@ void MeshImporter::LoadObjMesh(const std::string& objPath, Mesh& mesh) {
 
             vertex.texCoord = {
                 attrib.texcoords[2 * index.texcoord_index + 0],
-                attrib.texcoords[2 * index.texcoord_index + 1]
+                1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
             };
             
             vertex.color = { 1.0f, 1.0f, 1.0f};
 
+            if (uniqueVertices.count(vertex) == 0) {
+                uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
+                vertices.push_back(vertex);
+            }
+
             vertices.emplace_back(vertex);
-            indices.emplace_back(indices.size());
+            indices.push_back(uniqueVertices[vertex]);
         }
     }
 
