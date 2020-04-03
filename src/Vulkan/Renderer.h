@@ -102,6 +102,8 @@ private:
     void CreateGraphicsPipeline(std::shared_ptr<DescriptorSetLayout> descriptorSetLayout);
     void DestroyGraphicsPipeline();
 
+    void SetupMeshes();
+
     void CreateFramebuffers();
     void DestroyFramebuffers();
 

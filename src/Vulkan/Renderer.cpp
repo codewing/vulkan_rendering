@@ -41,9 +41,16 @@ Renderer::~Renderer() {
 void Renderer::SetupScene(std::shared_ptr<Scene> scene) {
     currentScene = scene;
 
+    SetupMeshes();
+
+    CreateCommandBuffers();
+    CreateSemaphores();
+}
+
+void Renderer::SetupMeshes() {
     for (auto& mesh : currentScene->GetMeshes()) {
         mesh->CreateBuffers(*this);
-    
+
         mesh->CreateTexture(*this);
         mesh->CreateSampler(*this);
         mesh->CreateDescriptors(*this);
@@ -52,9 +59,6 @@ void Renderer::SetupScene(std::shared_ptr<Scene> scene) {
 
         CreateGraphicsPipeline(mesh->GetDescriptorSetLayout());
     }
-
-    CreateCommandBuffers();
-    CreateSemaphores();
 }
 
 void Renderer::InitVulkan() {
@@ -398,12 +402,12 @@ void Renderer::RecreateSwapchain() {
     CreateSwapchain();
     CreateImageViews();
     CreateRenderPass();
-    //CreateGraphicsPipeline();
+
     CreateDepthResources();
     CreateFramebuffers();
-    // unused handled in meshCreateUniformBuffers();
-    //CreateDescriptorPool();
-    //CreateDescriptorSets();
+
+    SetupMeshes();
+
     CreateCommandBuffers();
 }
 
