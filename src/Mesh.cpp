@@ -2,11 +2,11 @@
 // Created by codewing on 12/03/2020.
 //
 
-#include "Mesh.h"
+#include "vkr/Mesh.h"
 
-#include "Vertex.h"
-#include "Image.h"
-#include "Vulkan/Renderer.h"
+#include "vkr/Vertex.h"
+#include "vkr/Image.h"
+#include "vkr/Vulkan/Renderer.h"
 #include "Vulkan/Image/VulkanImage.h"
 #include "Vulkan/Image/VulkanSampler.h"
 #include "Vulkan/Descriptor/DescriptorPool.h"

@@ -11,7 +11,7 @@
 #include "../Scene.h"
 #include "../Vertex.h"
 #include "../UniformBufferObject.h"
-#include "Pipeline/Pipeline.h"
+#include "../../../Vulkan/Pipeline/Pipeline.h"
 
 class Window;
 class QueueFamilyIndices;

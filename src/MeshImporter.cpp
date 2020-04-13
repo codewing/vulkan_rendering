@@ -2,7 +2,7 @@
 // Created by codewing on 12/03/2020.
 //
 
-#include "MeshImporter.h"
+#include "vkr/MeshImporter.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
@@ -10,9 +10,9 @@
 #include <iostream>
 #include <unordered_map>
 
-#include "Vertex.h"
-#include "Mesh.h"
-#include "Image.h"
+#include "vkr/Vertex.h"
+#include "vkr/Mesh.h"
+#include "vkr/Image.h"
 
 
 std::shared_ptr<Mesh> MeshImporter::LoadObjModel(const std::string& objPath, const std::string& texturePath) {

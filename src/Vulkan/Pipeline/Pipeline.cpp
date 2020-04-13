@@ -4,7 +4,7 @@
 
 #include "Pipeline.h"
 
-#include "../../Vertex.h"
+#include "vkr/Vertex.h"
 #include "../VulkanUtilities.h"
 
 

@@ -5,7 +5,7 @@
 #include "DescriptorSetLayout.h"
 #include "../VulkanUtilities.h"
 
-#include "../Renderer.h"
+#include "vkr/Vulkan/Renderer.h"
 
 
 DescriptorSetLayout::DescriptorSetLayout(const std::vector<DescriptorSetLayoutBinding>& bindings) : bindings(

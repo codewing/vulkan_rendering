@@ -2,17 +2,17 @@
 // Created by codewing on 20.04.2018.
 //
 
-#include "Scene.h"
+#include "vkr/Scene.h"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Mesh.h"
-#include "Vertex.h"
-#include "Image.h"
-#include "MeshImporter.h"
+#include "vkr/Mesh.h"
+#include "vkr/Vertex.h"
+#include "vkr/Image.h"
+#include "vkr/MeshImporter.h"
 
 
 Scene::Scene() {}

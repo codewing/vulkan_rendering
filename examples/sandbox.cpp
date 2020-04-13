@@ -1,9 +1,13 @@
+//
+// Created by codewing on 13/04/2020.
+//
+
 #include <iostream>
 #include <memory>
-#include "vkr/Vulkan/Renderer.h"
-#include "vkr/GLFWWindow.h"
-#include "vkr/Scene.h"
-#include "vkr/Time.h"
+#include <vkr/Vulkan/Renderer.h>
+#include <vkr/GLFWWindow.h>
+#include <vkr/Scene.h>
+#include <vkr/Time.h>
 
 int main() {
 
@@ -11,7 +15,7 @@ int main() {
     std::shared_ptr<GLFWWindow> window = std::make_shared<GLFWWindow>("Vulkan Window", 1024, 768);
     std::shared_ptr<Renderer> renderer = std::make_shared<Renderer>(std::static_pointer_cast<Window>(window));
     std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-    
+
     try {
         scene->Setup();
         renderer->SetupScene(scene);

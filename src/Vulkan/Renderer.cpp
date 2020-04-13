@@ -10,14 +10,14 @@
 #include <algorithm>
 
 #include "../BUILD_OPTIONS.h"
-#include "../Image.h"
-#include "../UniformBufferObject.h"
-#include "../Utilities.h"
-#include "../Vertex.h"
-#include "../Window.h"
-#include "../Mesh.h"
+#include "vkr/Image.h"
+#include "vkr/UniformBufferObject.h"
+#include "vkr/Utilities.h"
+#include "vkr/Vertex.h"
+#include "vkr/Window.h"
+#include "vkr/Mesh.h"
 
-#include "Renderer.h"
+#include "vkr/Vulkan/Renderer.h"
 #include "QueueFamilyIndices.h"
 #include "VulkanMemory.h"
 #include "VulkanDevice.h"

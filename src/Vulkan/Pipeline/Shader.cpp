@@ -5,7 +5,7 @@
 #include "Shader.h"
 
 #include "../VulkanUtilities.h"
-#include "../../Utilities.h"
+#include "vkr/Utilities.h"
 
 ShaderModule::ShaderModule(const std::string& shaderPath) : shaderPath(shaderPath) {}
 
