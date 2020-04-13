@@ -79,8 +79,7 @@ void Renderer::DeInitVulkan() {
     CleanupSwapchain();
 
     for(auto& mesh : currentScene->GetMeshes()) {
-        mesh->DestroyBuffer(*this);
-        mesh->DestroyUniformBuffers(*this);
+        mesh->FreeMesh(*this);
     }
 
     DestroySemaphores();
@@ -488,6 +487,7 @@ void Renderer::CreateGraphicsPipeline(std::shared_ptr<DescriptorSetLayout> descr
 }
 
 void Renderer::DestroyGraphicsPipeline() {
+    pipelineLayout->FreePipelineLayout();
     graphicsPipeline.reset();
 }
 

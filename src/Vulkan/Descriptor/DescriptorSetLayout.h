@@ -19,6 +19,7 @@ public:
 
     VkDescriptorSetLayout Compile(VkDevice device);
     VkDescriptorSetLayout Handle() const;
+    void FreeDescriptorSetLayout();
 
     std::vector<VkDescriptorPoolSize> GetDescriptorPoolSize(uint32_t poolSize);
 

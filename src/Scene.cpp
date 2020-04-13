@@ -59,9 +59,7 @@ void Scene::Setup() {
 }
 
 void Scene::Teardown(Renderer& renderer) {
-    for(auto& mesh : meshes) {
-        mesh->FreeMesh(renderer);
-    }
+
 }
 
 void Scene::UpdateCamera(float deltaSinceStart, float aspectRatio) {

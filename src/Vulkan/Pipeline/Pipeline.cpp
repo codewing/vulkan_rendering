@@ -173,6 +173,8 @@ VkPipelineLayout PipelineLayout::Handle() {
     return pipelineLayout;
 }
 
-PipelineLayout::~PipelineLayout() {
+void PipelineLayout::FreePipelineLayout() {
     vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 }
+
+PipelineLayout::~PipelineLayout() {}

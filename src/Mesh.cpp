@@ -51,7 +51,7 @@ void Mesh::CreateBuffers(Renderer& renderer) {
     ubos.resize(renderer.swapchainImages.size());
 }
 
-void Mesh::DestroyBuffer(Renderer& renderer) {
+void Mesh::DestroyMeshBuffer(Renderer& renderer) {
     renderer.DestroyBuffer(buffer, bufferMemory);
 }
 
@@ -93,10 +93,8 @@ VkDeviceSize Mesh::GetUniformBufferOffset(int swapchainIndex) {
 };
 
 void Mesh::FreeMesh(Renderer& renderer) {
-    vulkanTexture->FreeImage();
-    vulkanSampler->FreeSampler();
-
-    DestroyBuffer(renderer);
+    DestroyMeshBuffer(renderer);
+    descriptorSetLayout->FreeDescriptorSetLayout();
 }
 
 VkDescriptorSet Mesh::GetDescriptorSet(uint32_t frame) { 

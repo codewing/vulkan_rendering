@@ -54,6 +54,8 @@ std::vector<VkDescriptorPoolSize> DescriptorSetLayout::GetDescriptorPoolSize(uin
     return std::move(poolSizes);
 }
 
-DescriptorSetLayout::~DescriptorSetLayout() {
+void DescriptorSetLayout::FreeDescriptorSetLayout() {
     vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
 }
+
+DescriptorSetLayout::~DescriptorSetLayout() {}
