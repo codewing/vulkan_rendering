@@ -40,15 +40,7 @@ void Mesh::CreateBuffers(Renderer& renderer) {
 
     uniformBufferOffsets.resize(renderer.swapchainImages.size());
 
-    double uniformOffsetAlignment = renderer.physicalDeviceProperties.limits.minUniformBufferOffsetAlignment;
-    VkDeviceSize currentOffset = 0;
-    for(int i = 0; i < uniformBufferOffsets.size(); i++) {
-        auto num = std::ceil(currentOffset/uniformOffsetAlignment);
-        uniformBufferOffsets[i] = num * uniformOffsetAlignment;
-        currentOffset = uniformBufferOffsets[i] + sizeof(UniformBufferObject);
-    }
-    renderer.CreateUBOBuffer(currentOffset, uboBuffer, uboBufferMemory);
-    ubos.resize(renderer.swapchainImages.size());
+    CreateUniformBuffers(renderer);
 }
 
 void Mesh::DestroyMeshBuffer(Renderer& renderer) {
@@ -94,9 +86,6 @@ VkDeviceSize Mesh::GetUniformBufferOffset(int swapchainIndex) {
 
 void Mesh::FreeMesh(Renderer& renderer) {
     DestroyMeshBuffer(renderer);
-    descriptorSetLayout->FreeDescriptorSetLayout();
-    vulkanTexture->FreeImage();
-    vulkanSampler->FreeSampler();
 }
 
 VkDescriptorSet Mesh::GetDescriptorSet(uint32_t frame) { 
@@ -104,5 +93,18 @@ VkDescriptorSet Mesh::GetDescriptorSet(uint32_t frame) {
 }
 
 void Mesh::DestroyDescriptors(Renderer &renderer) {
+    descriptorSetLayout->FreeDescriptorSetLayout();
     descriptorPool->FreeDescriptorPool();
+}
+
+void Mesh::CreateUniformBuffers(Renderer& renderer) {
+    double uniformOffsetAlignment = renderer.physicalDeviceProperties.limits.minUniformBufferOffsetAlignment;
+    VkDeviceSize currentOffset = 0;
+    for(int i = 0; i < uniformBufferOffsets.size(); i++) {
+        auto num = std::ceil(currentOffset/uniformOffsetAlignment);
+        uniformBufferOffsets[i] = num * uniformOffsetAlignment;
+        currentOffset = uniformBufferOffsets[i] + sizeof(UniformBufferObject);
+    }
+    renderer.CreateUBOBuffer(currentOffset, uboBuffer, uboBufferMemory);
+    ubos.resize(renderer.swapchainImages.size());
 }

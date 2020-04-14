@@ -60,6 +60,7 @@ public:
 
     void CreateBuffers(Renderer& renderer);
     void DestroyMeshBuffer(Renderer& renderer);
+    void CreateUniformBuffers(Renderer& renderer);
     void DestroyUniformBuffers(Renderer& renderer);
     void CopyDataToGPU(Renderer& renderer);
     void UpdateUniformBuffer(Renderer& renderer, uint32_t imageIndex);
