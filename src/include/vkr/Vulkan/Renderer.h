@@ -57,7 +57,7 @@ private:
     std::shared_ptr<VulkanImage> depthImage = nullptr;
 
     VkRenderPass renderPass;
-    std::shared_ptr<Pipeline> graphicsPipeline;
+    std::shared_ptr<Pipeline> graphicsPipeline = nullptr;
     std::shared_ptr<PipelineLayout> pipelineLayout;
 
     VkCommandPool graphicCommandPool;
@@ -69,7 +69,7 @@ private:
 
     VkDebugReportCallbackEXT callback = VK_NULL_HANDLE;
 
-    const std::vector<const char *> validationLayers = {"VK_LAYER_LUNARG_standard_validation"};
+    const std::vector<const char *> validationLayers = {"VK_LAYER_KHRONOS_validation"};
     const std::vector<const char *> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
     // Methods

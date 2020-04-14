@@ -57,7 +57,7 @@ void Renderer::SetupMeshes() {
 
         mesh->CopyDataToGPU(*this);
 
-        CreateGraphicsPipeline(mesh->GetDescriptorSetLayout());
+        if(graphicsPipeline == nullptr) CreateGraphicsPipeline(mesh->GetDescriptorSetLayout());
     }
 }
 
@@ -101,11 +101,11 @@ void Renderer:: CreateInstance() {
 
     VkApplicationInfo applicationInfo{};
     applicationInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    applicationInfo.pApplicationName = "Voxel World Generation";
+    applicationInfo.pApplicationName = "Vulkan Rendering";
     applicationInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
     applicationInfo.pEngineName = "No Engine";
     applicationInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-    applicationInfo.apiVersion = VK_API_VERSION_1_0;
+    applicationInfo.apiVersion = VK_API_VERSION_1_2;
 
     VkInstanceCreateInfo instanceCreateInfo{};
     instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -937,8 +937,6 @@ void Renderer::CreateDescriptors(Mesh& mesh) {
 }
 
 void Renderer::CreateTextureImage(Image& img, std::shared_ptr<VulkanImage>& vulkanTexture) {
-    // TODO remove Image img("assets/textures/statue.jpg");
-
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
 

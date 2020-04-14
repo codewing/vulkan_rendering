@@ -95,6 +95,8 @@ VkDeviceSize Mesh::GetUniformBufferOffset(int swapchainIndex) {
 void Mesh::FreeMesh(Renderer& renderer) {
     DestroyMeshBuffer(renderer);
     descriptorSetLayout->FreeDescriptorSetLayout();
+    vulkanTexture->FreeImage();
+    vulkanSampler->FreeSampler();
 }
 
 VkDescriptorSet Mesh::GetDescriptorSet(uint32_t frame) { 
