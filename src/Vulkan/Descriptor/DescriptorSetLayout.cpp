@@ -5,11 +5,13 @@
 #include "DescriptorSetLayout.h"
 #include "../VulkanUtilities.h"
 
+#include "vkr/Vulkan/Renderer.h"
 
-DescriptorSetLayout::DescriptorSetLayout(const std::vector<DescriptorSetLayoutBinding> &bindings) : bindings(
+
+DescriptorSetLayout::DescriptorSetLayout(const std::vector<DescriptorSetLayoutBinding>& bindings) : bindings(
         bindings) {}
 
-void DescriptorSetLayout::Compile(VkDevice device) {
+VkDescriptorSetLayout DescriptorSetLayout::Compile(VkDevice device) {
     this->device = device;
 
     std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings;
@@ -29,12 +31,31 @@ void DescriptorSetLayout::Compile(VkDevice device) {
     layoutInfo.pBindings = setLayoutBindings.data();
 
     ErrorCheck(vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayout));
+
+    return descriptorSetLayout;
 }
 
 VkDescriptorSetLayout DescriptorSetLayout::Handle() const {
     return descriptorSetLayout;
 }
 
-DescriptorSetLayout::~DescriptorSetLayout() {
+std::vector<VkDescriptorPoolSize> DescriptorSetLayout::GetDescriptorPoolSize(uint32_t poolSize) {
+
+    std::vector<VkDescriptorPoolSize> poolSizes;
+
+    for(const auto& binding : bindings) {
+        VkDescriptorPoolSize descriptorPoolSize;
+        descriptorPoolSize.type = binding.descriptorType;
+        descriptorPoolSize.descriptorCount = binding.descriptorCount * poolSize;
+
+        poolSizes.push_back(descriptorPoolSize);
+    }
+
+    return std::move(poolSizes);
+}
+
+void DescriptorSetLayout::FreeDescriptorSetLayout() {
     vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
 }
+
+DescriptorSetLayout::~DescriptorSetLayout() {}

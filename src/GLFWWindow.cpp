@@ -2,7 +2,7 @@
 // Created by codewing on 20/10/2017.
 //
 
-#include "GLFWWindow.h"
+#include "vkr/GLFWWindow.h"
 
 #define GLFW_INCLUDE_VULKAN
 

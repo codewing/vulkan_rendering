@@ -11,12 +11,14 @@
 #include "../Scene.h"
 #include "../Vertex.h"
 #include "../UniformBufferObject.h"
-#include "Pipeline/Pipeline.h"
+#include "../../../Vulkan/Pipeline/Pipeline.h"
 
 class Window;
 class QueueFamilyIndices;
 class VulkanImage;
 class VulkanSampler;
+class Image;
+class DescriptorPool;
 
 class Renderer {
 
@@ -25,6 +27,8 @@ public:
     Renderer(std::shared_ptr<Window> window);
     ~Renderer();
 
+    void SetupScene(std::shared_ptr<Scene> scene);
+
     bool Run();
 
     void RecreateSwapchain();
@@ -32,9 +36,11 @@ public:
 private:
     // Variables
     std::shared_ptr<Window> window;
+    std::shared_ptr<Scene> currentScene;
 
     VkInstance instance = VK_NULL_HANDLE;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+    VkPhysicalDeviceProperties physicalDeviceProperties;
     VkDevice device = VK_NULL_HANDLE;
 
     VkQueue graphicsQueue = VK_NULL_HANDLE;
@@ -51,33 +57,19 @@ private:
     std::shared_ptr<VulkanImage> depthImage = nullptr;
 
     VkRenderPass renderPass;
-    std::shared_ptr<Pipeline> graphicsPipeline;
+    std::shared_ptr<Pipeline> graphicsPipeline = nullptr;
     std::shared_ptr<PipelineLayout> pipelineLayout;
-
-    VkBuffer vertexBuffer;
-    VkDeviceMemory vertexBufferMemory;
-    VkBuffer indexBuffer;
-    VkDeviceMemory indexBufferMemory;
-    std::vector<VkBuffer> uniformBuffers;
-    std::vector<VkDeviceMemory> uniformBuffersMemory;
-
-    std::shared_ptr<VulkanImage> texture = nullptr;
-    std::shared_ptr<VulkanSampler> sampler = nullptr;
 
     VkCommandPool graphicCommandPool;
     VkCommandPool transferCommandPool;
     std::vector<VkCommandBuffer> graphicCommandBuffers;
-
-    VkDescriptorPool descriptorPool;
-    std::shared_ptr<DescriptorSetLayout> descriptorSetLayout;
-    std::vector<VkDescriptorSet> descriptorSets;
 
     VkSemaphore imageAvailableSemaphore;
     VkSemaphore renderFinishedSemaphore;
 
     VkDebugReportCallbackEXT callback = VK_NULL_HANDLE;
 
-    const std::vector<const char *> validationLayers = {"VK_LAYER_LUNARG_standard_validation"};
+    const std::vector<const char *> validationLayers = {"VK_LAYER_KHRONOS_validation"};
     const std::vector<const char *> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
     // Methods
@@ -107,38 +99,27 @@ private:
     void CreateRenderPass();
     void DestroyRenderPass();
 
-    void CreateDescriptorSetLayout();
-    void DestroyDescriptorSetLayout();
-
-    void CreateGraphicsPipeline();
+    void CreateGraphicsPipeline(std::shared_ptr<DescriptorSetLayout> descriptorSetLayout);
     void DestroyGraphicsPipeline();
+
+    void SetupMeshes();
 
     void CreateFramebuffers();
     void DestroyFramebuffers();
 
     void CreateMeshBuffer(VkDeviceSize size, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+    void CreateUBOBuffer(VkDeviceSize size, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
     void DestroyBuffer(VkBuffer buffer, VkDeviceMemory bufferMemory);
 
     void CopyDataToBuffer(void* data, VkDeviceSize dataSize, VkBuffer buffer, VkDeviceSize bufferOffset);
-
-    void CreateVertexBuffer(std::vector<Vertex>& vertices);
-    void DestroyVertexBuffer();
-
-    void CreateIndexBuffer(std::vector<uint32_t>& indices);
-    void DestroyIndexBuffer();
-
-    void CreateUniformBuffers();
     void UpdateUniformBuffer(VkDeviceMemory uniformBufferMemory, UniformBufferObject& ubo, VkDeviceSize bufferOffset);
-    void DestroyUniformBuffers();
 
     void CreateCommandPools();
     void DestroyCommandPools();
 
     void CreateCommandBuffers();
 
-    void CreateDescriptorPool();
-    void DestroyDescriptorPool();
-    void CreateDescriptorSets();
+    void CreateDescriptors(Mesh& mesh);
 
     void DrawFrame();
 
@@ -150,8 +131,8 @@ private:
     void CreateDepthResources();
     void DestroyDepthResources();
 
-    void CreateTextureImage();
-    void CreateTextureSampler();
+    void CreateTextureImage(Image& img, std::shared_ptr<VulkanImage>& vulkanTexture);
+    void CreateTextureSampler(std::shared_ptr<VulkanSampler>& vulkanSampler);
 
     std::vector<const char *> GetRequiredExtensions();
     bool IsDeviceSuitable(VkPhysicalDevice vkPhysicalDevice);
@@ -173,5 +154,6 @@ private:
     void DestroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT callback,
                                        const VkAllocationCallbacks *pAllocator);
 
-    friend class Mesh;
+
+    friend class Mesh; friend class DescriptorSetLayout; friend class DescriptorPool;
 };

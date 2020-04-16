@@ -22,6 +22,7 @@ public:
 
     void Compile(VkDevice device);
     VkPipelineLayout Handle();
+    void FreePipelineLayout();
 
     std::vector<std::shared_ptr<DescriptorSetLayout>> descriptorSetLayouts;
 

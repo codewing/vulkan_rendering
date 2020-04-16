@@ -28,6 +28,6 @@ public:
     static uint32_t
     FindMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
-    static void CopyMemoryToGpu(VkDevice device, VkDeviceMemory deviceMemory, void* data, size_t size, VkDeviceSize offset = 0);
+    static void CopyMemoryToGpu(VkDevice device, VkDeviceMemory deviceMemory, void* data, VkDeviceSize size, VkDeviceSize offset = 0);
 
 };

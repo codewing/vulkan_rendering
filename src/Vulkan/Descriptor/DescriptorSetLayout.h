@@ -9,14 +9,19 @@
 #include "DescriptorSetLayoutBinding.h"
 
 
+class Renderer;
+
 class DescriptorSetLayout {
 
 public:
     DescriptorSetLayout(const std::vector<DescriptorSetLayoutBinding> &bindings);
     ~DescriptorSetLayout();
 
-    void Compile(VkDevice device);
+    VkDescriptorSetLayout Compile(VkDevice device);
     VkDescriptorSetLayout Handle() const;
+    void FreeDescriptorSetLayout();
+
+    std::vector<VkDescriptorPoolSize> GetDescriptorPoolSize(uint32_t poolSize);
 
     std::vector<DescriptorSetLayoutBinding> bindings;
 

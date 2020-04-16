@@ -4,7 +4,7 @@
 
 #include "Pipeline.h"
 
-#include "../../Vertex.h"
+#include "vkr/Vertex.h"
 #include "../VulkanUtilities.h"
 
 
@@ -155,7 +155,7 @@ void PipelineLayout::Compile(VkDevice device) {
     this->device = device;
 
     for(const auto& dsl : descriptorSetLayouts) {
-        dsl->Compile(device);
+        compiledDescriptorSetLayouts.push_back(dsl->Handle());
     }
 
     VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
@@ -173,6 +173,8 @@ VkPipelineLayout PipelineLayout::Handle() {
     return pipelineLayout;
 }
 
-PipelineLayout::~PipelineLayout() {
+void PipelineLayout::FreePipelineLayout() {
     vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 }
+
+PipelineLayout::~PipelineLayout() {}

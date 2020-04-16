@@ -37,7 +37,7 @@ add_custom_target(
 #####   Copying the assets   #####
 ##################################
 
-set(ASSET_FOLDERS textures)
+set(ASSET_FOLDERS textures models)
 
 foreach(FOLDER ${ASSET_FOLDERS})
 
